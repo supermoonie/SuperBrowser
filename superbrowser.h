@@ -2,6 +2,7 @@
 #define SUPERBROWSER_H
 
 #include <QObject>
+#include "webpage.h"
 #include "memorycookiejar.h"
 
 class SuperBrowser
@@ -9,9 +10,9 @@ class SuperBrowser
 public:
     SuperBrowser();
     ~SuperBrowser();
-    void init();
 
 private:
+
     MemoryCookieJar* cookieJar;
 };
 

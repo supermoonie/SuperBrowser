@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QStandardPaths>
+#include <QWebFrame>
 #include "terminal.h"
 #include "encoding.h"
 #include "webpage.h"
@@ -15,5 +16,6 @@ int main(int argc, char *argv[])
     terminal->cout("path: ", false);
     terminal->cout(path, true);
     WebPage webPage;
+    webPage.currentFrame()->setUrl(QUrl("https://persons.shgjj.com/"));
     return app.exec();
 }

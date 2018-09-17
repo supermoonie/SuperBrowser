@@ -2,12 +2,15 @@
 #define MEMORYCOOKIEJAR_H
 
 #include <QNetworkCookieJar>
+#include <QNetworkCookie>
 #include <QObject>
 
 class MemoryCookieJar: public QNetworkCookieJar
 {
 
 public:
+    static MemoryCookieJar* instance();
+
     MemoryCookieJar(QObject* parent = NULL);
     ~MemoryCookieJar();
 

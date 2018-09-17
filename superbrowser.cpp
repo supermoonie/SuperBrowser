@@ -4,15 +4,10 @@ static SuperBrowser* superBrowser = NULL;
 
 SuperBrowser::SuperBrowser()
 {
-
+    cookieJar = MemoryCookieJar::instance();
 }
 
 SuperBrowser::~SuperBrowser()
 {
-
-}
-
-void SuperBrowser::init() {
-    cookieJar = new MemoryCookieJar();
 
 }

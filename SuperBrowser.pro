@@ -9,6 +9,7 @@ QT       += network webkitwidgets
 
 TARGET = SuperSpider
 CONFIG   += console
+CONFIG   += C++11
 CONFIG   -= app_bundle
 
 TEMPLATE = app
