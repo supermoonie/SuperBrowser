@@ -15,6 +15,7 @@ public:
 private:
     ReceiveThread* receiveThread;
     MemoryCookieJar* cookieJar;
+    WebPage* webPage;
 
 private slots:
     void onCommandReceived(const QString &rawCommand);

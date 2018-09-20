@@ -12,6 +12,7 @@ class WebPage: public QWebPage
 public:
     WebPage(QObject* parent = NULL);
     ~WebPage();
+    static WebPage* instance();
     QImage renderImage();
 
 private:

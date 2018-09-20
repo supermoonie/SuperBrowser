@@ -2,23 +2,27 @@
 #include <QBuffer>
 #include "terminal.h"
 
+static WebPage* webPage = NULL;
+
 WebPage::WebPage(QObject* parent): QWebPage(parent)
 {
     connect(this->currentFrame(), &QWebFrame::loadFinished, [=](){
         Terminal::instance()->cout(this->currentFrame()->url().toString() + " load finished", true);
         QImage image = renderImage();
         image.save("C:/yzm/captcha.png", "png");
-//        QByteArray bytes;
-//        QBuffer buffer(&bytes);
-//        buffer.open(QIODevice::WriteOnly);
-//        image.save(&buffer, "PNG");
-//        Terminal::instance()->cout(bytes.toBase64(), true);
     });
 }
 
 WebPage::~WebPage()
 {
 
+}
+
+WebPage* WebPage::instance() {
+    if(webPage == NULL) {
+        webPage = new WebPage();
+    }
+    return webPage;
 }
 
 QImage WebPage::renderImage() {
