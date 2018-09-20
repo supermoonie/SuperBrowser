@@ -1,5 +1,6 @@
 #include "webpage.h"
 #include <QBuffer>
+#include "terminal.h"
 
 WebPage::WebPage(QObject* parent): QWebPage(parent)
 {

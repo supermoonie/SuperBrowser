@@ -4,16 +4,20 @@
 #include <QObject>
 #include "webpage.h"
 #include "memorycookiejar.h"
+#include "receivethread.h"
 
-class SuperBrowser
+class SuperBrowser: public QObject
 {
 public:
-    SuperBrowser();
+    SuperBrowser(QObject* parent = NULL);
     ~SuperBrowser();
 
 private:
-
+    ReceiveThread* receiveThread;
     MemoryCookieJar* cookieJar;
+
+private slots:
+    void onCommandReceived(const QString &rawCommand);
 };
 
 #endif // SUPERBROWSER_H

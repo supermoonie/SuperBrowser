@@ -13,6 +13,9 @@ public:
     WebPage(QObject* parent = NULL);
     ~WebPage();
     QImage renderImage();
+
+private:
+
 };
 
 #endif // WEBPAGE_H

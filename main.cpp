@@ -5,6 +5,7 @@
 #include "terminal.h"
 #include "encoding.h"
 #include "webpage.h"
+#include "superbrowser.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +16,7 @@ int main(int argc, char *argv[])
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     terminal->cout("path: ", false);
     terminal->cout(path, true);
+    SuperBrowser browser;
     WebPage webPage;
     webPage.currentFrame()->setUrl(QUrl("https://persons.shgjj.com/"));
     return app.exec();

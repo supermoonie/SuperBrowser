@@ -22,11 +22,13 @@ SOURCES += main.cpp \
     encoding.cpp \
     memorycookiejar.cpp \
     superbrowser.cpp \
-    webpage.cpp
+    webpage.cpp \
+    receivethread.cpp
 
 HEADERS += \
     terminal.h \
     encoding.h \
     memorycookiejar.h \
     superbrowser.h \
-    webpage.h
+    webpage.h \
+    receivethread.h
