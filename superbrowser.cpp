@@ -3,9 +3,12 @@
 SuperBrowser::SuperBrowser(QObject* parent): QObject(parent)
 {
     cookieJar = MemoryCookieJar::instance();
+    networkAccessManager = new NetworkAccessManager(cookieJar, parent);
     webPage = WebPage::instance();
+    webPage->setNetworkAccessManager(networkAccessManager);
     commandMap = new QMap<QString, FUN>;
     commandMap->insert("navigate", &SuperBrowser::navigate);
+    commandMap->insert("getAllCookies", &SuperBrowser::getAllCookies);
     receiveThread = new ReceiveThread(NULL);
     connect(receiveThread, &ReceiveThread::received, this, &SuperBrowser::onCommandReceived);
     receiveThread->start();
@@ -13,12 +16,16 @@ SuperBrowser::SuperBrowser(QObject* parent): QObject(parent)
 
 SuperBrowser::~SuperBrowser()
 {
-    commandMap->clear();
-    delete commandMap;
-    receiveThread->stop();
     receiveThread->deleteLater();
     cookieJar->deleteLater();
     webPage->deleteLater();
+}
+
+void SuperBrowser::close() {
+    commandMap->clear();
+    delete commandMap;
+    receiveThread->stop();
+    QApplication::exit(0);
 }
 
 QJsonObject SuperBrowser::navigate(QJsonArray &parameters) {
@@ -28,6 +35,39 @@ QJsonObject SuperBrowser::navigate(QJsonArray &parameters) {
     QJsonObject json;
     json.insert("code", 200);
     return json;
+}
+
+QJsonObject SuperBrowser::getAllCookies(QJsonArray &parameters) {
+    QList<QNetworkCookie> cookies;
+    if(parameters.size() > 0) {
+        for(int i = 0; i < parameters.size(); i ++) {
+            QString url = parameters.at(i).toString();
+            cookies.append(cookieJar->cookies(url));
+        }
+    } else {
+        cookies = cookieJar->cookies(NULL);
+    }
+    QJsonObject json;
+    QJsonArray cookieArray;
+    for(int i = 0; i < cookies.size(); i ++) {
+        QNetworkCookie cookie = cookies.at(i);
+        QJsonObject cookieJson;
+        cookieJson.insert("name", QString(cookie.name()));
+        cookieJson.insert("value", QString(cookie.value()));
+        cookieJson.insert("domain", cookie.domain());
+        cookieJson.insert("path", cookie.path());
+        cookieJson.insert("expires", QJsonValue(cookie.expirationDate().toMSecsSinceEpoch()));
+        cookieJson.insert("httpOnly", QJsonValue(cookie.isHttpOnly()));
+        cookieJson.insert("secure", QJsonValue(cookie.isSecure()));
+        cookieJson.insert("session", QJsonValue(cookie.isSessionCookie()));
+        cookieArray.append(cookieJson);
+    }
+    json.insert("cookies", cookieArray);
+    return json;
+}
+
+QJsonObject SuperBrowser::getCookies(QJsonArray &parameters) {
+
 }
 
 void SuperBrowser::onCommandReceived(const QString &rawCommand) {
@@ -50,6 +90,10 @@ void SuperBrowser::onCommandReceived(const QString &rawCommand) {
         errorJson.insert("desc", "name lost");
         errorJson.insert("data", QJsonValue::Null);
         Terminal::instance()->cout(QString(QJsonDocument(errorJson).toJson()), true);
+        return;
+    }
+    if("close" == name) {
+        this->close();
         return;
     }
     if(!commandMap->contains(name)) {

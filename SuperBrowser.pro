@@ -23,7 +23,8 @@ SOURCES += main.cpp \
     memorycookiejar.cpp \
     superbrowser.cpp \
     webpage.cpp \
-    receivethread.cpp
+    receivethread.cpp \
+    networkaccessmanager.cpp
 
 HEADERS += \
     terminal.h \
@@ -31,4 +32,5 @@ HEADERS += \
     memorycookiejar.h \
     superbrowser.h \
     webpage.h \
-    receivethread.h
+    receivethread.h \
+    networkaccessmanager.h

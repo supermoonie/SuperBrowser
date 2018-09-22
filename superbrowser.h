@@ -7,9 +7,11 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QMap>
+#include <QApplication>
 #include "webpage.h"
 #include "memorycookiejar.h"
 #include "receivethread.h"
+#include "networkaccessmanager.h"
 
 class SuperBrowser: public QObject
 {
@@ -22,10 +24,15 @@ public:
 private:
     ReceiveThread* receiveThread;
     MemoryCookieJar* cookieJar;
+    NetworkAccessManager* networkAccessManager;
     WebPage* webPage;
     QMap<QString, FUN>* commandMap;
 
+private:
     QJsonObject navigate(QJsonArray &parameters);
+    void close();
+    QJsonObject getAllCookies(QJsonArray &parameters);
+    QJsonObject getCookies(QJsonArray &parameters);
 
 private slots:
     void onCommandReceived(const QString &rawCommand);
