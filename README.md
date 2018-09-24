@@ -4,9 +4,11 @@ super browser
 - 导航
 - 代理
 - cookie
-  - 增加 & 更新
+  - setCookie(cookie)
+  - setCookies([cookie])
   - 删除 & 删除全部
-  - 获取 & 获取全部
+  - getCookies()
+  - getCookies([url,url])
 - 截图 & pdf
 - 截取
 - 缓存目录
