@@ -20,4 +20,6 @@ super browser
 
 {"name":"getAllCookies","parameters":["https://www.baidu.com/"]}boundary---------
 
-{"name":"setCookie","parameters":{"name":"cookieName","value":"cookieValue","domain":"www.baidu.com","path":"/","expires":null,"httpOnly":true,"secure":true}}boundary---------
+{"name":"setCookie","parameters":{"name":"cookieName","value":"balabala","domain":"www.baidu.com","path":"/","expires":null,"httpOnly":true,"secure":true}}boundary---------
+
+{"name":"setCookies","parameters":[{"name":"cookieName1","value":"cookieValue1","domain":"www.baidu.com","path":"/","expires":null,"httpOnly":true,"secure":true},{"name":"cookieName2","value":"cookieValue2","domain":"www.baidu.com","path":"/","expires":null,"httpOnly":true,"secure":true}]}boundary---------

@@ -34,7 +34,12 @@ private:
     void close();
     void getAllCookies(QJsonObject &in, QJsonObject* out);
     void getCookies(QJsonObject &in, QJsonObject* out);
+    bool insertCookie(QJsonObject &cookieJson);
     void setCookie(QJsonObject &in, QJsonObject* out);
+    void setCookies(QJsonObject &in, QJsonObject* out);
+    bool deleteCookie(QJsonObject &cookieJson);
+    void deleteCookie(QJsonObject &in, QJsonObject* out);
+    void deleteCookies(QJsonObject &in, QJsonObject* out);
 
 private slots:
     void onCommandReceived(const QString &rawCommand);

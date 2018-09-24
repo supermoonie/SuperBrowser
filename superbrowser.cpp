@@ -10,6 +10,7 @@ SuperBrowser::SuperBrowser(QObject* parent): QObject(parent)
     commandMap->insert("navigate", &SuperBrowser::navigate);
     commandMap->insert("getAllCookies", &SuperBrowser::getAllCookies);
     commandMap->insert("setCookie", &SuperBrowser::setCookie);
+    commandMap->insert("setCookies", &SuperBrowser::setCookies);
     receiveThread = new ReceiveThread(NULL);
     connect(receiveThread, &ReceiveThread::received, this, &SuperBrowser::onCommandReceived);
     receiveThread->start();
@@ -31,7 +32,7 @@ void SuperBrowser::close() {
 
 void SuperBrowser::navigate(QJsonObject &in, QJsonObject* out) {
     webPage->action(QWebPage::Stop);
-    // TODO 增加对修改head的支持
+    // TODO 增加对自定义head的支持
     QString url = in.value("parameters").toObject().value("url").toString("about:blank");
     webPage->currentFrame()->load(QUrl::fromUserInput(url));
     out->insert("code", 200);
@@ -69,17 +70,14 @@ void SuperBrowser::getCookies(QJsonObject &in, QJsonObject* out) {
     this->getAllCookies(in, out);
 }
 
-void SuperBrowser::setCookie(QJsonObject &in, QJsonObject *out) {
-    QJsonObject cookieJson = in.value("parameters").toObject();
+bool SuperBrowser::insertCookie(QJsonObject &cookieJson) {
     QString name = cookieJson.value("name").toString();
     if(name.isNull() || name.isEmpty()) {
-        out->insert("success", false);
-        return;
+        return false;
     }
     QString value = cookieJson.value("value").toString();
     if(name.isNull() || name.isEmpty()) {
-        out->insert("success", false);
-        return;
+        return false;
     }
     QString currentHost = this->webPage->currentFrame()->url().host();
     QString domain = cookieJson.value("domain").toString(currentHost);
@@ -103,8 +101,33 @@ void SuperBrowser::setCookie(QJsonObject &in, QJsonObject *out) {
     cookie.setExpirationDate(QDateTime::fromMSecsSinceEpoch(expires));
     cookie.setHttpOnly(httpOnly);
     cookie.setSecure(secure);
-    bool flag = this->cookieJar->insertCookie(cookie);
+    return this->cookieJar->insertCookie(cookie);
+}
+
+void SuperBrowser::setCookie(QJsonObject &in, QJsonObject *out) {
+    QJsonObject cookieJson = in.value("parameters").toObject();
+    bool flag = this->insertCookie(cookieJson);
     out->insert("success", flag);
+}
+
+void SuperBrowser::setCookies(QJsonObject &in, QJsonObject *out) {
+    QJsonArray cookieArray = in.value("parameters").toArray();
+    for(int i = 0; i < cookieArray.size(); i ++) {
+        QJsonObject cookieJson = cookieArray.at(i).toObject();
+        this->insertCookie(cookieJson);
+    }
+}
+
+bool SuperBrowser::deleteCookie(QJsonObject &cookieJson) {
+
+}
+
+void SuperBrowser::deleteCookie(QJsonObject &in, QJsonObject *out) {
+
+}
+
+void SuperBrowser::deleteCookies(QJsonObject &in, QJsonObject *out) {
+
 }
 
 void SuperBrowser::onCommandReceived(const QString &rawCommand) {
