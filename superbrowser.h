@@ -8,6 +8,7 @@
 #include <QJsonArray>
 #include <QMap>
 #include <QApplication>
+#include <QDateTime>
 #include "webpage.h"
 #include "memorycookiejar.h"
 #include "receivethread.h"
@@ -15,7 +16,7 @@
 
 class SuperBrowser: public QObject
 {
-    typedef QJsonObject(SuperBrowser::*FUN)(QJsonArray&);
+    typedef void (SuperBrowser::*FUN)(QJsonObject&,QJsonObject*);
 
 public:
     SuperBrowser(QObject* parent = NULL);
@@ -29,10 +30,11 @@ private:
     QMap<QString, FUN>* commandMap;
 
 private:
-    QJsonObject navigate(QJsonArray &parameters);
+    void navigate(QJsonObject &in, QJsonObject* out);
     void close();
-    QJsonObject getAllCookies(QJsonArray &parameters);
-    QJsonObject getCookies(QJsonArray &parameters);
+    void getAllCookies(QJsonObject &in, QJsonObject* out);
+    void getCookies(QJsonObject &in, QJsonObject* out);
+    void setCookie(QJsonObject &in, QJsonObject* out);
 
 private slots:
     void onCommandReceived(const QString &rawCommand);

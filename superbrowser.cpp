@@ -9,6 +9,7 @@ SuperBrowser::SuperBrowser(QObject* parent): QObject(parent)
     commandMap = new QMap<QString, FUN>;
     commandMap->insert("navigate", &SuperBrowser::navigate);
     commandMap->insert("getAllCookies", &SuperBrowser::getAllCookies);
+    commandMap->insert("setCookie", &SuperBrowser::setCookie);
     receiveThread = new ReceiveThread(NULL);
     connect(receiveThread, &ReceiveThread::received, this, &SuperBrowser::onCommandReceived);
     receiveThread->start();
@@ -28,16 +29,16 @@ void SuperBrowser::close() {
     QApplication::exit(0);
 }
 
-QJsonObject SuperBrowser::navigate(QJsonArray &parameters) {
+void SuperBrowser::navigate(QJsonObject &in, QJsonObject* out) {
     webPage->action(QWebPage::Stop);
-    QString url = parameters.at(0).toObject().value("url").toString("about:blank");
+    // TODO 增加对修改head的支持
+    QString url = in.value("parameters").toObject().value("url").toString("about:blank");
     webPage->currentFrame()->load(QUrl::fromUserInput(url));
-    QJsonObject json;
-    json.insert("code", 200);
-    return json;
+    out->insert("code", 200);
 }
 
-QJsonObject SuperBrowser::getAllCookies(QJsonArray &parameters) {
+void SuperBrowser::getAllCookies(QJsonObject &in, QJsonObject* out) {
+    QJsonArray parameters = in.value("parameters").toArray();
     QList<QNetworkCookie> cookies;
     if(parameters.size() > 0) {
         for(int i = 0; i < parameters.size(); i ++) {
@@ -47,7 +48,6 @@ QJsonObject SuperBrowser::getAllCookies(QJsonArray &parameters) {
     } else {
         cookies = cookieJar->cookies(NULL);
     }
-    QJsonObject json;
     QJsonArray cookieArray;
     for(int i = 0; i < cookies.size(); i ++) {
         QNetworkCookie cookie = cookies.at(i);
@@ -62,12 +62,49 @@ QJsonObject SuperBrowser::getAllCookies(QJsonArray &parameters) {
         cookieJson.insert("session", QJsonValue(cookie.isSessionCookie()));
         cookieArray.append(cookieJson);
     }
-    json.insert("cookies", cookieArray);
-    return json;
+    out->insert("cookies", cookieArray);
 }
 
-QJsonObject SuperBrowser::getCookies(QJsonArray &parameters) {
+void SuperBrowser::getCookies(QJsonObject &in, QJsonObject* out) {
+    this->getAllCookies(in, out);
+}
 
+void SuperBrowser::setCookie(QJsonObject &in, QJsonObject *out) {
+    QJsonObject cookieJson = in.value("parameters").toObject();
+    QString name = cookieJson.value("name").toString();
+    if(name.isNull() || name.isEmpty()) {
+        out->insert("success", false);
+        return;
+    }
+    QString value = cookieJson.value("value").toString();
+    if(name.isNull() || name.isEmpty()) {
+        out->insert("success", false);
+        return;
+    }
+    QString currentHost = this->webPage->currentFrame()->url().host();
+    QString domain = cookieJson.value("domain").toString(currentHost);
+    QString currentPath = this->webPage->currentFrame()->url().path();
+    QString path = cookieJson.value("path").toString(currentPath);
+    QDateTime defaultTime = QDateTime::currentDateTime().addDays(7);
+    QVariant expiresVariant = cookieJson.value("expires").toVariant();
+    qint64 expires = 0;
+    if(!expiresVariant.canConvert(QMetaType::LongLong) || expiresVariant.isNull() || expiresVariant.isValid()) {
+        expires = defaultTime.toMSecsSinceEpoch();
+    } else {
+        expires = (qint64) expiresVariant.toLongLong();
+    }
+    bool httpOnly = cookieJson.value("httpOnly").toBool(false);
+    bool secure = cookieJson.value("secure").toBool(false);
+    QNetworkCookie cookie;
+    cookie.setName(name.toUtf8());
+    cookie.setValue(value.toUtf8());
+    cookie.setDomain(domain);
+    cookie.setPath(path);
+    cookie.setExpirationDate(QDateTime::fromMSecsSinceEpoch(expires));
+    cookie.setHttpOnly(httpOnly);
+    cookie.setSecure(secure);
+    bool flag = this->cookieJar->insertCookie(cookie);
+    out->insert("success", flag);
 }
 
 void SuperBrowser::onCommandReceived(const QString &rawCommand) {
@@ -105,7 +142,8 @@ void SuperBrowser::onCommandReceived(const QString &rawCommand) {
         return;
     }
     FUN fun = commandMap->value(name);
-    QJsonArray parameters = commandJson.value("parameters").toArray();
-    QJsonObject json = (this->*fun)(parameters);
-    Terminal::instance()->cout(QString(QJsonDocument(json).toJson()), true);
+    QJsonObject* result = new QJsonObject;
+    (this->*fun)(commandJson, result);
+    Terminal::instance()->cout(QString(QJsonDocument(*result).toJson()), true);
+    delete result;
 }

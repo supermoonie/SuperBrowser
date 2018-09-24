@@ -8,8 +8,8 @@ WebPage::WebPage(QObject* parent): QWebPage(parent)
 {
     connect(this->currentFrame(), &QWebFrame::loadFinished, [=](){
         Terminal::instance()->cout(this->currentFrame()->url().toString() + " load finished", true);
-        QImage image = renderImage();
-        image.save("C:/yzm/captcha.png", "png");
+//        QImage image = renderImage();
+//        image.save("C:/yzm/captcha.png", "png");
     });
 }
 

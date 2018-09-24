@@ -9,11 +9,11 @@ class MemoryCookieJar: public QNetworkCookieJar
 {
 
 public:
-    static MemoryCookieJar* instance();
-
     MemoryCookieJar(QObject* parent = NULL);
     ~MemoryCookieJar();
 
+public:
+    static MemoryCookieJar* instance();
     QList<QNetworkCookie> cookies(const QString& url = QString()) const;
 };
 

@@ -23,6 +23,6 @@ QList<QNetworkCookie> MemoryCookieJar::cookies(const QString &url) const {
     if(url.isEmpty()) {
         return allCookies();
     } else {
-        return cookiesForUrl(url);
+        return QNetworkCookieJar::cookiesForUrl(url);
     }
 }
