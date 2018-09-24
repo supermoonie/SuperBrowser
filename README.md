@@ -12,6 +12,12 @@ super browser
 - 缓存目录
 - 执行JavaScript
 
-{"name":"navigate","parameters":[{"url":"https://www.baidu.com"}]}boundary---------
+{"name":"navigate","parameters":{"url":"https://www.baidu.com"}}boundary---------
+
 {"name":"close"}boundary---------
+
 {"name":"getAllCookies"}boundary---------
+
+{"name":"getAllCookies","parameters":["https://www.baidu.com/"]}boundary---------
+
+{"name":"setCookie","parameters":{"name":"cookieName","value":"cookieValue","domain":"www.baidu.com","path":"/","expires":null,"httpOnly":true,"secure":true}}boundary---------
