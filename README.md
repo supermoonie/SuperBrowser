@@ -3,9 +3,9 @@ super browser
 
 - 导航
 - 配置
-  - 代理
-  - UserAgent
-  - 拦截规则
+  - setProxy(proxy)
+  - setUserAgent(ua)
+  - setInterceptor(interceptor)
   - 截取规则
 - cookie
   - setCookie(cookie)
@@ -23,7 +23,11 @@ super browser
 ```json
 {"name":"navigate","parameters":{"url":"https://ip.cn/"}}boundary---------
 
-{"name":"setProxy","parameters":{"host":"127.0.0.1","port":8888,"user":"","password":"","type":"http"}}boundary---------
+{"name":"setProxy","parameters":{"host":"192.168.83.119","port":8024,"user":"","password":"","type":"http"}}boundary---------
+
+{"name":"setUserAgent","parameters":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/17.17134"}boundary---------
+
+{"name":"setInterceptor","parameters":"al.jpg"}boundary---------
 
 {"name":"close"}boundary---------
 
