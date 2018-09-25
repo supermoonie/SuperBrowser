@@ -15,6 +15,8 @@ SuperBrowser::SuperBrowser(QObject* parent): QObject(parent)
     commandMap.insert("setProxy", &SuperBrowser::setProxy);
     commandMap.insert("setUserAgent", &SuperBrowser::setUserAgent);
     commandMap.insert("setInterceptor", &SuperBrowser::setInterceptor);
+    commandMap.insert("addExtractor", &SuperBrowser::addExtractor);
+    commandMap.insert("addExtractors", &SuperBrowser::addExtractors);
     receiveThread = new ReceiveThread(NULL);
     connect(receiveThread, &ReceiveThread::received, this, &SuperBrowser::onCommandReceived);
     receiveThread->start();
@@ -87,6 +89,34 @@ void SuperBrowser::setInterceptor(QJsonObject &in, QJsonObject *out) {
     }
     bool flag = this->networkAccessManager->setInterceptor(QRegExp(interceptor));
     out->insert("success", flag);
+}
+
+bool SuperBrowser::addExtractor(const QString &extractor) {
+    if(extractor.isNull() || extractor.isEmpty()) {
+        return false;
+    }
+    return this->networkAccessManager->addExtractor(QRegExp(extractor));
+}
+
+void SuperBrowser::addExtractor(QJsonObject &in, QJsonObject *out) {
+    QString extractor = in.value("parameters").toString();
+    if(extractor.isNull() || extractor.isEmpty()) {
+        return;
+    }
+    bool flag = this->addExtractor(extractor);
+    out->insert(extractor, flag);
+}
+
+void SuperBrowser::addExtractors(QJsonObject &in, QJsonObject *out) {
+    QJsonArray extractors = in.value("parameters").toArray();
+    for(int i = 0; i < extractors.size(); i ++) {
+        QString extractor = extractors.at(i).toString();
+        if(extractor.isNull() || extractor.isEmpty()) {
+            continue;
+        }
+        bool flag = this->addExtractor(extractor);
+        out->insert(extractor, flag);
+    }
 }
 
 void SuperBrowser::getAllCookies(QJsonObject &in, QJsonObject* out) {

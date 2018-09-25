@@ -21,9 +21,9 @@ super browser
 - 日志输出
 
 ```json
-{"name":"navigate","parameters":{"url":"https://ip.cn/"}}boundary---------
+{"name":"navigate","parameters":{"url":"https://persons.shgjj.com/"}}boundary---------
 
-{"name":"setProxy","parameters":{"host":"192.168.83.119","port":8024,"user":"","password":"","type":"http"}}boundary---------
+{"name":"setProxy","parameters":{"host":"127.0.0.1","port":8888,"user":"","password":"","type":"http"}}boundary---------
 
 {"name":"setUserAgent","parameters":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/17.17134"}boundary---------
 
@@ -42,6 +42,8 @@ super browser
 {"name":"deleteCookie","parameters":{"name":"cookieName","url":"https://www.baidu.com/"}}boundary---------
 
 {"name":"deleteCookies","parameters":[{"name":"cookieName1","url":"https://www.baidu.com/"},{"name":"cookieName2","url":"https://www.baidu.com/"}]}boundary---------
+
+{"name":"addExtractor","parameters":".*(VerifyImageServlet).*"}boundary---------
 ```
 
 
