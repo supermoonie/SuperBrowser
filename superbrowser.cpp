@@ -11,6 +11,8 @@ SuperBrowser::SuperBrowser(QObject* parent): QObject(parent)
     commandMap->insert("getAllCookies", &SuperBrowser::getAllCookies);
     commandMap->insert("setCookie", &SuperBrowser::setCookie);
     commandMap->insert("setCookies", &SuperBrowser::setCookies);
+    commandMap->insert("deleteCookie", &SuperBrowser::deleteCookie);
+    commandMap->insert("deleteCookies", &SuperBrowser::deleteCookies);
     receiveThread = new ReceiveThread(NULL);
     connect(receiveThread, &ReceiveThread::received, this, &SuperBrowser::onCommandReceived);
     receiveThread->start();
@@ -119,15 +121,38 @@ void SuperBrowser::setCookies(QJsonObject &in, QJsonObject *out) {
 }
 
 bool SuperBrowser::deleteCookie(QJsonObject &cookieJson) {
-
+    QString name = cookieJson.value("name").toString();
+    if(name.isNull() || name.isEmpty()) {
+        return false;
+    }
+    QString urlStr = cookieJson.value("url").toString();
+    QUrl url;
+    if(urlStr.isNull() || urlStr.isEmpty()) {
+        url = this->webPage->currentFrame()->url();
+    } else {
+        url = QUrl::fromUserInput(urlStr);
+    }
+    QString host = url.host();
+    QString path = url.path();
+    QNetworkCookie cookie;
+    cookie.setName(name.toUtf8());
+    cookie.setDomain(host);
+    cookie.setPath(path);
+    return this->cookieJar->deleteCookie(cookie);
 }
 
 void SuperBrowser::deleteCookie(QJsonObject &in, QJsonObject *out) {
-
+    QJsonObject cookieJson = in.value("parameters").toObject();
+    bool flag = this->deleteCookie(cookieJson);
+    out->insert("success", flag);
 }
 
 void SuperBrowser::deleteCookies(QJsonObject &in, QJsonObject *out) {
-
+    QJsonArray array = in.value("parameters").toArray();
+    for(int i = 0; i < array.size(); i ++) {
+        QJsonObject cookieJson = array.at(i).toObject();
+        this->deleteCookie(cookieJson);
+    }
 }
 
 void SuperBrowser::onCommandReceived(const QString &rawCommand) {
