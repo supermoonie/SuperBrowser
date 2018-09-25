@@ -6,10 +6,12 @@ static WebPage* webPage = NULL;
 
 WebPage::WebPage(QObject* parent): QWebPage(parent)
 {
+    userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36";
+    this->setViewportSize(QSize(980, 900));
     connect(this->currentFrame(), &QWebFrame::loadFinished, [=](){
         Terminal::instance()->cout(this->currentFrame()->url().toString() + " load finished", true);
-//        QImage image = renderImage();
-//        image.save("C:/yzm/captcha.png", "png");
+        QImage image = renderImage();
+        image.save("C:/yzm/captcha.png", "png");
     });
 }
 
@@ -18,11 +20,19 @@ WebPage::~WebPage()
 
 }
 
-WebPage* WebPage::instance() {
+WebPage* WebPage::instance(QObject* parent) {
     if(webPage == NULL) {
-        webPage = new WebPage();
+        webPage = new WebPage(parent);
     }
     return webPage;
+}
+
+void WebPage::setUserAgent(const QString &ua) {
+    this->userAgent = ua;
+}
+
+QString WebPage::userAgentForUrl(const QUrl &url) const {
+    return userAgent;
 }
 
 QImage WebPage::renderImage() {

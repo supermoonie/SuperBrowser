@@ -15,6 +15,6 @@ int main(int argc, char *argv[])
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     terminal->cout("path: ", false);
     terminal->cout(path, true);
-    SuperBrowser browser;
+    SuperBrowser browser(&app);
     return app.exec();
 }

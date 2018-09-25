@@ -21,7 +21,9 @@ super browser
 - 日志输出
 
 ```json
-{"name":"navigate","parameters":{"url":"https://www.baidu.com"}}boundary---------
+{"name":"navigate","parameters":{"url":"https://ip.cn/"}}boundary---------
+
+{"name":"setProxy","parameters":{"host":"127.0.0.1","port":8888,"user":"","password":"","type":"http"}}boundary---------
 
 {"name":"close"}boundary---------
 

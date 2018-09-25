@@ -12,9 +12,9 @@ MemoryCookieJar::~MemoryCookieJar()
 
 }
 
-MemoryCookieJar* MemoryCookieJar::instance() {
+MemoryCookieJar* MemoryCookieJar::instance(QObject* parent) {
     if(memoryCookieJar == NULL) {
-        memoryCookieJar = new MemoryCookieJar();
+        memoryCookieJar = new MemoryCookieJar(parent);
     }
     return memoryCookieJar;
 }

@@ -9,6 +9,8 @@
 #include <QMap>
 #include <QApplication>
 #include <QDateTime>
+#include <QNetworkProxy>
+#include <QNetworkProxyFactory>
 #include "webpage.h"
 #include "memorycookiejar.h"
 #include "receivethread.h"
@@ -27,11 +29,15 @@ private:
     MemoryCookieJar* cookieJar;
     NetworkAccessManager* networkAccessManager;
     WebPage* webPage;
-    QMap<QString, FUN>* commandMap;
+    QMap<QString, FUN> commandMap;
 
 private:
     void navigate(QJsonObject &in, QJsonObject* out);
     void close();
+    void setProxy(QJsonObject &in, QJsonObject* out);
+    void setUserAgent(QJsonObject &in, QJsonObject* out);
+    void setInterceptor(QJsonObject &in, QJsonObject* out);
+    // cookie operation
     void getAllCookies(QJsonObject &in, QJsonObject* out);
     void getCookies(QJsonObject &in, QJsonObject* out);
     bool insertCookie(QJsonObject &cookieJson);
@@ -40,6 +46,7 @@ private:
     bool deleteCookie(QJsonObject &cookieJson);
     void deleteCookie(QJsonObject &in, QJsonObject* out);
     void deleteCookies(QJsonObject &in, QJsonObject* out);
+    // cookie operation
 
 private slots:
     void onCommandReceived(const QString &rawCommand);

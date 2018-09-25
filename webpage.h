@@ -12,10 +12,17 @@ class WebPage: public QWebPage
 public:
     WebPage(QObject* parent = NULL);
     ~WebPage();
-    static WebPage* instance();
+
+public:
+    static WebPage* instance(QObject* parent = NULL);
+    void setUserAgent(const QString &ua);
+
+protected:
     QImage renderImage();
+    QString userAgentForUrl(const QUrl &url) const;
 
 private:
+    QString userAgent;
 
 };
 

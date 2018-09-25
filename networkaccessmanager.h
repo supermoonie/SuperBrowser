@@ -2,6 +2,9 @@
 #define NETWORKACCESSMANAGER_H
 
 #include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkDiskCache>
+#include <QRegExp>
 #include <memorycookiejar.h>
 
 class NetworkAccessManager : public QNetworkAccessManager
@@ -11,8 +14,13 @@ public:
     NetworkAccessManager(MemoryCookieJar* cookieJar, QObject *parent = 0);
     ~NetworkAccessManager();
 
+public:
+    bool setInterceptor(const QRegExp &interceptor);
+
 private:
     MemoryCookieJar* cookieJar;
+    QNetworkDiskCache* diskCache;
+    QRegExp interceptor;
 
 private:
     QByteArray readOutgoingData(QIODevice* outgoingData);

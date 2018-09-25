@@ -2,32 +2,31 @@
 
 SuperBrowser::SuperBrowser(QObject* parent): QObject(parent)
 {
-    cookieJar = MemoryCookieJar::instance();
-    networkAccessManager = new NetworkAccessManager(cookieJar, parent);
-    webPage = WebPage::instance();
+    cookieJar = MemoryCookieJar::instance(this);
+    networkAccessManager = new NetworkAccessManager(cookieJar, this);
+    webPage = WebPage::instance(this);
     webPage->setNetworkAccessManager(networkAccessManager);
-    commandMap = new QMap<QString, FUN>;
-    commandMap->insert("navigate", &SuperBrowser::navigate);
-    commandMap->insert("getAllCookies", &SuperBrowser::getAllCookies);
-    commandMap->insert("setCookie", &SuperBrowser::setCookie);
-    commandMap->insert("setCookies", &SuperBrowser::setCookies);
-    commandMap->insert("deleteCookie", &SuperBrowser::deleteCookie);
-    commandMap->insert("deleteCookies", &SuperBrowser::deleteCookies);
+    commandMap.insert("navigate", &SuperBrowser::navigate);
+    commandMap.insert("getAllCookies", &SuperBrowser::getAllCookies);
+    commandMap.insert("setCookie", &SuperBrowser::setCookie);
+    commandMap.insert("setCookies", &SuperBrowser::setCookies);
+    commandMap.insert("deleteCookie", &SuperBrowser::deleteCookie);
+    commandMap.insert("deleteCookies", &SuperBrowser::deleteCookies);
+    commandMap.insert("setProxy", &SuperBrowser::setProxy);
+    commandMap.insert("setUserAgent", &SuperBrowser::setUserAgent);
+    commandMap.insert("setInterceptor", &SuperBrowser::setInterceptor);
     receiveThread = new ReceiveThread(NULL);
     connect(receiveThread, &ReceiveThread::received, this, &SuperBrowser::onCommandReceived);
     receiveThread->start();
+    QNetworkProxyFactory::setUseSystemConfiguration(true);
 }
 
 SuperBrowser::~SuperBrowser()
 {
-    receiveThread->deleteLater();
-    cookieJar->deleteLater();
-    webPage->deleteLater();
+
 }
 
 void SuperBrowser::close() {
-    commandMap->clear();
-    delete commandMap;
     receiveThread->stop();
     QApplication::exit(0);
 }
@@ -38,6 +37,56 @@ void SuperBrowser::navigate(QJsonObject &in, QJsonObject* out) {
     QString url = in.value("parameters").toObject().value("url").toString("about:blank");
     webPage->currentFrame()->load(QUrl::fromUserInput(url));
     out->insert("code", 200);
+}
+
+void SuperBrowser::setProxy(QJsonObject &in, QJsonObject *out) {
+    QJsonObject proxyJson = in.value("parameters").toObject();
+    QNetworkProxy proxy;
+    QString type = proxyJson.value("type").toString();
+    if("NO_PROXY" == type) {
+        proxy.setType(QNetworkProxy::NoProxy);
+    } else {
+        if("SOCKS5_PROXY" == type) {
+            proxy.setType(QNetworkProxy::Socks5Proxy);
+        } else {
+            proxy.setType(QNetworkProxy::HttpProxy);
+        }
+        QString host = proxyJson.value("host").toString();
+        int port = proxyJson.value("port").toInt();
+        proxy.setHostName(host);
+        proxy.setPort(port);
+        QString user = in.value("user").toString();
+        if(!user.isNull() && !user.isEmpty()) {
+            proxy.setUser(user);
+        }
+        QString password = in.value("password").toString();
+        if(!password.isNull() && !password.isEmpty()) {
+            proxy.setPassword(password);
+        }
+    }
+
+    QNetworkProxy::setApplicationProxy(proxy);
+    out->insert("success", true);
+}
+
+void SuperBrowser::setUserAgent(QJsonObject &in, QJsonObject *out) {
+    QString ua = in.value("parameters").toString();
+    if(ua.isNull() || ua.isEmpty()) {
+        out->insert("success", false);
+        return;
+    }
+    this->webPage->setUserAgent(ua);
+    out->insert("success", true);
+}
+
+void SuperBrowser::setInterceptor(QJsonObject &in, QJsonObject *out) {
+    QString interceptor = in.value("parameters").toString();
+    if(interceptor.isNull() || interceptor.isEmpty()) {
+        out->insert("success", false);
+        return;
+    }
+    bool flag = this->networkAccessManager->setInterceptor(QRegExp(interceptor));
+    out->insert("success", flag);
 }
 
 void SuperBrowser::getAllCookies(QJsonObject &in, QJsonObject* out) {
@@ -116,7 +165,9 @@ void SuperBrowser::setCookies(QJsonObject &in, QJsonObject *out) {
     QJsonArray cookieArray = in.value("parameters").toArray();
     for(int i = 0; i < cookieArray.size(); i ++) {
         QJsonObject cookieJson = cookieArray.at(i).toObject();
-        this->insertCookie(cookieJson);
+        bool flag = this->insertCookie(cookieJson);
+        QString name = cookieJson.value("name").toString();
+        out->insert(name, flag);
     }
 }
 
@@ -151,7 +202,9 @@ void SuperBrowser::deleteCookies(QJsonObject &in, QJsonObject *out) {
     QJsonArray array = in.value("parameters").toArray();
     for(int i = 0; i < array.size(); i ++) {
         QJsonObject cookieJson = array.at(i).toObject();
-        this->deleteCookie(cookieJson);
+        bool flag = this->deleteCookie(cookieJson);
+        QString name = cookieJson.value("name").toString();
+        out->insert(name, flag);
     }
 }
 
@@ -181,7 +234,7 @@ void SuperBrowser::onCommandReceived(const QString &rawCommand) {
         this->close();
         return;
     }
-    if(!commandMap->contains(name)) {
+    if(!commandMap.contains(name)) {
         QJsonObject errorJson;
         errorJson.insert("code", 404);
         errorJson.insert("desc", name + " not support");
@@ -189,7 +242,7 @@ void SuperBrowser::onCommandReceived(const QString &rawCommand) {
         Terminal::instance()->cout(QString(QJsonDocument(errorJson).toJson()), true);
         return;
     }
-    FUN fun = commandMap->value(name);
+    FUN fun = commandMap.value(name);
     QJsonObject* result = new QJsonObject;
     (this->*fun)(commandJson, result);
     Terminal::instance()->cout(QString(QJsonDocument(*result).toJson()), true);

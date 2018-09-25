@@ -13,7 +13,7 @@ public:
     ~MemoryCookieJar();
 
 public:
-    static MemoryCookieJar* instance();
+    static MemoryCookieJar* instance(QObject* parent = NULL);
     QList<QNetworkCookie> cookies(const QString& url = QString()) const;
 };
 
