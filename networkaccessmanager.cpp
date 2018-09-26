@@ -38,7 +38,7 @@ QNetworkReply* NetworkAccessManager::createRequest(Operation op, const QNetworkR
     if(flag) {
         qDebug() << path << " will be save ";
         if(reply->bytesAvailable() > 0) {
-            extractMap.insertMulti(path, reply->peek(reply->bytesAvailable()).toBase64());
+            extractMap.insert(path, reply->peek(reply->bytesAvailable()).toBase64());
         } else {
             QByteArray * data = new QByteArray;
             connect(reply, &QNetworkReply::readyRead, [reply, data, path](){
@@ -49,7 +49,7 @@ QNetworkReply* NetworkAccessManager::createRequest(Operation op, const QNetworkR
             });
             connect(reply, &QNetworkReply::finished, [=](){
                 qDebug() << path << " finished ";
-                extractMap.insertMulti(path, (*data).toBase64());
+                extractMap.insert(path, (*data).toBase64());
                 delete data;
             });
         }
@@ -74,6 +74,27 @@ bool NetworkAccessManager::addExtractor(const QRegExp &extractor) {
     }
     this->extractors.append(extractor);
     return true;
+}
+
+QByteArray NetworkAccessManager::extract(const QRegExp &extractor) {
+    if(extractor.isEmpty() || !extractor.isValid()) {
+        return NULL;
+    }
+    QString key;
+    QList<QString> keys = this->extractMap.keys();
+    for(int i = 0; i < keys.size(); i ++) {
+        key = keys.at(i);
+        if(extractor.exactMatch(key)) {
+            break;
+        }
+    }
+    if(key.isEmpty()) {
+        return NULL;
+    }
+    const QString path = key;
+    QByteArray data = this->extractMap.value(path);
+    extractMap.remove(path);
+    return data;
 }
 
 QByteArray NetworkAccessManager::readOutgoingData(QIODevice *outgoingData) {

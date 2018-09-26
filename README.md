@@ -6,7 +6,7 @@ super browser
   - setProxy(proxy)
   - setUserAgent(ua)
   - setInterceptor(interceptor)
-  - 截取规则
+  - addExtractor(extractor)
 - cookie
   - setCookie(cookie)
   - setCookies([cookie])
@@ -15,13 +15,13 @@ super browser
   - getCookies()
   - getCookies([url,url])
 - 截图 & pdf
-- 截取
+- getResponse(extractor) & getResponse([extractor])
 - 缓存目录
 - 执行JavaScript
 - 日志输出
 
 ```json
-{"name":"navigate","parameters":{"url":"http://pianke.me/pages/timeline/timeline.html"}}boundary---------
+{"name":"navigate","parameters":{"url":"http://pianke.me/"}}boundary---------
 
 {"name":"setProxy","parameters":{"host":"127.0.0.1","port":8888,"user":"","password":"","type":"http"}}boundary---------
 
@@ -43,7 +43,11 @@ super browser
 
 {"name":"deleteCookies","parameters":[{"name":"cookieName1","url":"https://www.baidu.com/"},{"name":"cookieName2","url":"https://www.baidu.com/"}]}boundary---------
 
-{"name":"addExtractor","parameters":".*(listByTag.php).*"}boundary---------
+{"name":"addExtractor","parameters":".*(interested.php).*"}boundary---------
+{"name":"addExtractors","parameters":[".*(interested.php).*",".*(day.php).*"]}boundary---------
+
+{"name":"getResponse","parameters":".*(day.php).*"}boundary---------
+{"name":"getResponses","parameters":[".*(interested.php).*",".*(day.php).*"]}boundary---------
 ```
 
 

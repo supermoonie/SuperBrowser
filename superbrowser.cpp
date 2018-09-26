@@ -17,6 +17,8 @@ SuperBrowser::SuperBrowser(QObject* parent): QObject(parent)
     commandMap.insert("setInterceptor", &SuperBrowser::setInterceptor);
     commandMap.insert("addExtractor", &SuperBrowser::addExtractor);
     commandMap.insert("addExtractors", &SuperBrowser::addExtractors);
+    commandMap.insert("getResponse", &SuperBrowser::getResponse);
+    commandMap.insert("getResponses", &SuperBrowser::getResponses);
     receiveThread = new ReceiveThread(NULL);
     connect(receiveThread, &ReceiveThread::received, this, &SuperBrowser::onCommandReceived);
     receiveThread->start();
@@ -116,6 +118,31 @@ void SuperBrowser::addExtractors(QJsonObject &in, QJsonObject *out) {
         }
         bool flag = this->addExtractor(extractor);
         out->insert(extractor, flag);
+    }
+}
+
+QByteArray SuperBrowser::getResponse(const QString &extractor) {
+    if(extractor.isNull() || extractor.isEmpty()) {
+        return NULL;
+    }
+    return this->networkAccessManager->extract(QRegExp(extractor));
+}
+
+void SuperBrowser::getResponse(QJsonObject &in, QJsonObject *out) {
+    QString extractor = in.value("parameters").toString();
+    QByteArray data = getResponse(extractor);
+    out->insert("body", QString(data));
+}
+
+void SuperBrowser::getResponses(QJsonObject &in, QJsonObject *out) {
+    QJsonArray extractorArray = in.value("parameters").toArray();
+    for(int i = 0; i < extractorArray.size(); i ++) {
+        QString extractor = extractorArray.at(i).toString();
+        if(extractor.isNull() || extractor.isEmpty()) {
+            continue;
+        }
+        QByteArray data = getResponse(extractor);
+        out->insert(extractor, QString(data));
     }
 }
 

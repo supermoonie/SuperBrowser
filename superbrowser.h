@@ -47,9 +47,15 @@ private:
     void deleteCookie(QJsonObject &in, QJsonObject* out);
     void deleteCookies(QJsonObject &in, QJsonObject* out);
     // cookie operation
+
+    // extractor operation
     bool addExtractor(const QString &extractor);
     void addExtractor(QJsonObject &in, QJsonObject* out);
     void addExtractors(QJsonObject &in, QJsonObject* out);
+    QByteArray getResponse(const QString &extractor);
+    void getResponse(QJsonObject &in, QJsonObject* out);
+    void getResponses(QJsonObject &in, QJsonObject* out);
+    // extractor operation
 
 private slots:
     void onCommandReceived(const QString &rawCommand);

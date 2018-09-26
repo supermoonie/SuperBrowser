@@ -7,7 +7,7 @@
 #include <QNetworkDiskCache>
 #include <QRegExp>
 #include <QList>
-#include <QMultiMap>
+#include <QMap>
 #include <memorycookiejar.h>
 
 class NetworkAccessManager : public QNetworkAccessManager
@@ -20,13 +20,14 @@ public:
 public:
     bool setInterceptor(const QRegExp &interceptor);
     bool addExtractor(const QRegExp &extractor);
+    QByteArray extract(const QRegExp &extractor);
 
 private:
     MemoryCookieJar* cookieJar;
     QNetworkDiskCache* diskCache;
     QRegExp interceptor;
     QList<QRegExp> extractors;
-    QMultiMap<QString, QByteArray> extractMap;
+    QMap<QString, QByteArray> extractMap;
 
 private:
     QByteArray readOutgoingData(QIODevice* outgoingData);
