@@ -4,11 +4,11 @@
 #
 #-------------------------------------------------
 
-QT       += network webkitwidgets
+QT       += network webkitwidgets widgets
 
 
 TARGET = SuperSpider
-CONFIG   += console
+CONFIG   += app
 CONFIG   += C++11
 CONFIG   -= app_bundle
 
@@ -24,7 +24,9 @@ SOURCES += main.cpp \
     superbrowser.cpp \
     webpage.cpp \
     receivethread.cpp \
-    networkaccessmanager.cpp
+    networkaccessmanager.cpp \
+    mainwindow.cpp \
+    tcpserver.cpp
 
 HEADERS += \
     terminal.h \
@@ -33,4 +35,6 @@ HEADERS += \
     superbrowser.h \
     webpage.h \
     receivethread.h \
-    networkaccessmanager.h
+    networkaccessmanager.h \
+    mainwindow.h \
+    tcpserver.h

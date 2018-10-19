@@ -5,6 +5,7 @@
 #include "terminal.h"
 #include "encoding.h"
 #include "superbrowser.h"
+#include "mainwindow.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +16,8 @@ int main(int argc, char *argv[])
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     terminal->cout("path: ", false);
     terminal->cout(path, true);
-    SuperBrowser browser(&app);
+//    SuperBrowser browser(&app);
+    MainWindow w;
+    w.show();
     return app.exec();
 }
