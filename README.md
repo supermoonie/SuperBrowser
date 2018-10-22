@@ -50,5 +50,8 @@ super browser
 {"name":"getResponses","parameters":[".*(interested.php).*",".*(day.php).*"]}boundary---------
 ```
 
+TcpServer 启动失败：
 
+- Debug：弹框提示
+- Release：输出到命令行提示
 
