@@ -26,7 +26,8 @@ SOURCES += main.cpp \
     receivethread.cpp \
     networkaccessmanager.cpp \
     mainwindow.cpp \
-    tcpserver.cpp
+    tcpserver.cpp \
+    config.cpp
 
 HEADERS += \
     terminal.h \
@@ -37,4 +38,5 @@ HEADERS += \
     receivethread.h \
     networkaccessmanager.h \
     mainwindow.h \
-    tcpserver.h
+    tcpserver.h \
+    config.h

@@ -4,7 +4,7 @@ SuperBrowser::SuperBrowser(QObject* parent): QObject(parent)
 {
     cookieJar = MemoryCookieJar::instance(this);
     networkAccessManager = new NetworkAccessManager(cookieJar, this);
-    webPage = WebPage::instance(this);
+    webPage = new WebPage(this);
     webPage->setNetworkAccessManager(networkAccessManager);
     commandMap.insert("navigate", &SuperBrowser::navigate);
     commandMap.insert("getAllCookies", &SuperBrowser::getAllCookies);

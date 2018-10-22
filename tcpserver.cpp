@@ -2,15 +2,9 @@
 
 static const QString BOUNDARY = "boundary-----------";
 
-TcpServer::TcpServer(int port, QObject *parent) : QTcpServer(parent)
+TcpServer::TcpServer(QObject *parent) : QTcpServer(parent)
 {
-    if(!this->listen(QHostAddress::Any, port))
-    {
-        emit listenError();
-        return;
-    } else {
-        connect(this, &TcpServer::newConnection, this, &TcpServer::onNewConnection);
-    }
+
 }
 
 TcpServer::~TcpServer()
@@ -32,4 +26,10 @@ void TcpServer::onSocketReadyRead() {
         QString command = message.left(index);
         emit commandReceived(command);
     }
+}
+
+void TcpServer::write(QByteArray &data) {
+    data.append("\r\n").append(BOUNDARY).append("\r\n");
+    socket->write(data);
+    socket->flush();
 }

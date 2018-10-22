@@ -8,8 +8,9 @@ class TcpServer : public QTcpServer
 {
     Q_OBJECT
 public:
-    explicit TcpServer(int port, QObject *parent = 0);
+    explicit TcpServer(QObject *parent = 0);
     ~TcpServer();
+    void write(QByteArray &data);
 
 private:
     QTcpSocket* socket;
@@ -20,10 +21,11 @@ signals:
     void commandReceived(const QString &command);
 
 private slots:
-    void onNewConnection();
     void onSocketReadyRead();
 
 public slots:
+    void onNewConnection();
+
 };
 
 #endif // TCPSERVER_H

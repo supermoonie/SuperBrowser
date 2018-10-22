@@ -2,8 +2,6 @@
 #include <QBuffer>
 #include "terminal.h"
 
-static WebPage* webPage = NULL;
-
 WebPage::WebPage(QObject* parent): QWebPage(parent)
 {
     userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36";
@@ -48,13 +46,6 @@ WebPage::WebPage(QObject* parent): QWebPage(parent)
 WebPage::~WebPage()
 {
 
-}
-
-WebPage* WebPage::instance(QObject* parent) {
-    if(webPage == NULL) {
-        webPage = new WebPage(parent);
-    }
-    return webPage;
 }
 
 void WebPage::setUserAgent(const QString &ua) {
@@ -102,4 +93,9 @@ QImage WebPage::renderImage() {
         }
     }
     return buffer;
+}
+
+void WebPage::onCommandReceived(const QString &command) {
+    QByteArray data = QByteArray(command.toUtf8());
+
 }

@@ -14,7 +14,6 @@ public:
     ~WebPage();
 
 public:
-    static WebPage* instance(QObject* parent = NULL);
     void setUserAgent(const QString &ua);
 
 protected:
@@ -23,6 +22,12 @@ protected:
 
 private:
     QString userAgent;
+
+signals:
+    void commandProcessed(QByteArray &data);
+
+public slots:
+    void onCommandReceived(const QString &command);
 
 };
 
