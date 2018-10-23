@@ -9,8 +9,12 @@
 
 class WebPage: public QWebPage
 {
+    Q_OBJECT
+
+    typedef void (WebPage::*FUN)(QJsonObject&,QJsonObject&);
+
 public:
-    WebPage(QObject* parent = NULL);
+    explicit WebPage(QObject* parent = NULL);
     ~WebPage();
 
 public:
@@ -22,6 +26,11 @@ protected:
 
 private:
     QString userAgent;
+    QMap<QString, FUN> commandMap;
+
+private:
+    void navigate(QJsonObject &in, QJsonObject &out);
+    void setProxy(QJsonObject &in, QJsonObject &out);
 
 signals:
     void commandProcessed(QByteArray &data);

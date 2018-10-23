@@ -2,7 +2,7 @@
 
 SuperBrowser::SuperBrowser(QObject* parent): QObject(parent)
 {
-    cookieJar = MemoryCookieJar::instance(this);
+    cookieJar = new MemoryCookieJar(this);
     networkAccessManager = new NetworkAccessManager(cookieJar, this);
     webPage = new WebPage(this);
     webPage->setNetworkAccessManager(networkAccessManager);

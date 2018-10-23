@@ -30,6 +30,7 @@ private slots:
     void changeLocation();
     void onStartTcpActionTriggered();
     void onStopTcpActionTriggered();
+    void onWebPageLoadStarted();
 
 signals:
 

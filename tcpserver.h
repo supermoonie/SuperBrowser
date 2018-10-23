@@ -17,7 +17,6 @@ private:
     QString message;
 
 signals:
-    void listenError();
     void commandReceived(const QString &command);
 
 private slots:

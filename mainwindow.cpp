@@ -8,17 +8,20 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
+    progress = 0;
     tcpServer = new TcpServer(this);
     connect(tcpServer, &TcpServer::newConnection, tcpServer, &TcpServer::onNewConnection);
-    progress = 0;
     view = new QWebView(this);
     webPage = new WebPage(this);
-    connect(tcpServer, &TcpServer::commandReceived, webPage, &WebPage::onCommandReceived);
-//    connect(webPage, &WebPage::commandProcessed, tcpServer, &TcpServer::write);
     view->setPage(webPage);
+    connect(tcpServer, &TcpServer::commandReceived, webPage, &WebPage::onCommandReceived);
+    connect(webPage, &WebPage::commandProcessed, tcpServer, &TcpServer::write);
+    connect(webPage, &WebPage::loadStarted, this, &MainWindow::onWebPageLoadStarted);
+
     locationEdit = new QLineEdit(this);
     locationEdit->setSizePolicy(QSizePolicy::Expanding, locationEdit->sizePolicy().verticalPolicy());
     connect(locationEdit, &QLineEdit::returnPressed, this, &MainWindow::changeLocation);
+
     QToolBar *toolBar = addToolBar(tr("Navigation"));
     toolBar->addAction(view->pageAction(QWebPage::Back));
     toolBar->addAction(view->pageAction(QWebPage::Forward));
@@ -65,6 +68,11 @@ void MainWindow::onStopTcpActionTriggered() {
     tcpServer->close();
     startTcpAction->setEnabled(true);
     stopTcpAction->setDisabled(true);
+}
+
+void MainWindow::onWebPageLoadStarted() {
+    QUrl currentUrl = webPage->currentFrame()->url();
+    locationEdit->setText(currentUrl.toString());
 }
 
 bool MainWindow::startTcpServer(int port) {

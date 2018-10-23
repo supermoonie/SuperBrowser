@@ -1,46 +1,23 @@
 #include "webpage.h"
 #include <QBuffer>
+#include <QJsonParseError>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QNetworkProxy>
 #include "terminal.h"
 
 WebPage::WebPage(QObject* parent): QWebPage(parent)
 {
     userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36";
     this->setViewportSize(QSize(980, 900));
-    QWebSettings * settings = this->settings();
-    settings->setAttribute(QWebSettings::AutoLoadImages, true);
-    settings->setAttribute(QWebSettings::DnsPrefetchEnabled, true);
-    settings->setAttribute(QWebSettings::JavascriptEnabled, true);
-    settings->setAttribute(QWebSettings::JavascriptCanOpenWindows, false);
-    settings->setAttribute(QWebSettings::JavascriptCanCloseWindows, false);
-    settings->setAttribute(QWebSettings::JavascriptCanAccessClipboard, false);
-    settings->setAttribute(QWebSettings::JavaEnabled, false);
-    settings->setAttribute(QWebSettings::PluginsEnabled, false);
-    settings->setAttribute(QWebSettings::PrivateBrowsingEnabled, false);
-    settings->setAttribute(QWebSettings::SpatialNavigationEnabled, false);
-    settings->setAttribute(QWebSettings::LinksIncludedInFocusChain, false);
-    settings->setAttribute(QWebSettings::ZoomTextOnly, false);
-    settings->setAttribute(QWebSettings::PrintElementBackgrounds, false);
+    QWebSettings * settings = QWebSettings::globalSettings();
     settings->setAttribute(QWebSettings::OfflineStorageDatabaseEnabled, true);
     settings->setAttribute(QWebSettings::OfflineWebApplicationCacheEnabled, false);
     settings->setAttribute(QWebSettings::LocalStorageEnabled, true);
-    settings->setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
     settings->setAttribute(QWebSettings::LocalContentCanAccessFileUrls, true);
-    settings->setAttribute(QWebSettings::XSSAuditingEnabled, true);
-    settings->setAttribute(QWebSettings::AcceleratedCompositingEnabled, false);
-    settings->setAttribute(QWebSettings::Accelerated2dCanvasEnabled, false);
-    settings->setAttribute(QWebSettings::TiledBackingStoreEnabled, false);
-    settings->setAttribute(QWebSettings::FrameFlatteningEnabled, false);
-    settings->setAttribute(QWebSettings::SiteSpecificQuirksEnabled, true);
-    settings->setAttribute(QWebSettings::CSSGridLayoutEnabled, false);
-    settings->setAttribute(QWebSettings::ScrollAnimatorEnabled, false);
-    settings->setAttribute(QWebSettings::CaretBrowsingEnabled, false);
-    settings->setAttribute(QWebSettings::NotificationsEnabled, false);
-    settings->setAttribute(QWebSettings::DeveloperExtrasEnabled, false);
-    connect(this->currentFrame(), &QWebFrame::loadFinished, [=](){
-        Terminal::instance()->cout(this->currentFrame()->url().toString() + " load finished", true);
-//        QImage image = renderImage();
-//        image.save("C:/yzm/captcha.png", "png");
-    });
+    settings->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+    commandMap.insert("navigate", &WebPage::navigate);
+    commandMap.insert("setProxy", &WebPage::setProxy);
 }
 
 WebPage::~WebPage()
@@ -54,6 +31,39 @@ void WebPage::setUserAgent(const QString &ua) {
 
 QString WebPage::userAgentForUrl(const QUrl &url) const {
     return userAgent;
+}
+
+void WebPage::navigate(QJsonObject &in, QJsonObject &out) {
+    QString url = in.value("parameters").toObject().value("url").toString("about:blank");
+    this->currentFrame()->setUrl(QUrl::fromUserInput(url));
+}
+
+void WebPage::setProxy(QJsonObject &in, QJsonObject &out) {
+    QJsonObject proxyJson = in.value("parameters").toObject();
+    QNetworkProxy proxy;
+    QString type = proxyJson.value("type").toString();
+    if("NO_PROXY" == type) {
+        proxy.setType(QNetworkProxy::NoProxy);
+    } else {
+        if("SOCKS5_PROXY" == type) {
+            proxy.setType(QNetworkProxy::Socks5Proxy);
+        } else {
+            proxy.setType(QNetworkProxy::HttpProxy);
+        }
+        QString host = proxyJson.value("host").toString();
+        int port = proxyJson.value("port").toInt();
+        proxy.setHostName(host);
+        proxy.setPort(port);
+        QString user = in.value("user").toString();
+        if(!user.isNull() && !user.isEmpty()) {
+            proxy.setUser(user);
+        }
+        QString password = in.value("password").toString();
+        if(!password.isNull() && !password.isEmpty()) {
+            proxy.setPassword(password);
+        }
+    }
+    QNetworkProxy::setApplicationProxy(proxy);
 }
 
 QImage WebPage::renderImage() {
@@ -96,6 +106,35 @@ QImage WebPage::renderImage() {
 }
 
 void WebPage::onCommandReceived(const QString &command) {
-    QByteArray data = QByteArray(command.toUtf8());
-
+    QJsonParseError* parseError = new QJsonParseError;
+    QJsonDocument commandJsonDocument = QJsonDocument::fromJson(command.toUtf8(), parseError);
+    if(parseError->error != QJsonParseError::NoError)
+    {
+        QJsonObject errorJson;
+        errorJson.insert("error", parseError->errorString());
+        QByteArray errorResult = QJsonDocument(errorJson).toJson();
+        emit commandProcessed(errorResult);
+        return;
+    }
+    QJsonObject commandJson = commandJsonDocument.object();
+    QString name = commandJson.value("name").toString();
+    if(name.isNull() || name.isEmpty()) {
+        QJsonObject errorJson;
+        errorJson.insert("error", "name lost");
+        QByteArray errorResult = QJsonDocument(errorJson).toJson();
+        emit commandProcessed(errorResult);
+        return;
+    }
+    if(!commandMap.contains(name)) {
+        QJsonObject errorJson;
+        errorJson.insert("error", name + " not support");
+        QByteArray errorResult = QJsonDocument(errorJson).toJson();
+        emit commandProcessed(errorResult);
+        return;
+    }
+    FUN fun = commandMap.value(name);
+    QJsonObject result;
+    (this->*fun)(commandJson, result);
+    QByteArray resultData = QJsonDocument(result).toJson();
+    emit commandProcessed(resultData);
 }
