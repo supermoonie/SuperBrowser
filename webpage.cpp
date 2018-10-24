@@ -4,7 +4,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkProxy>
-#include "terminal.h"
 
 WebPage::WebPage(QObject* parent): QWebPage(parent)
 {

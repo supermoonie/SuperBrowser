@@ -5,7 +5,6 @@
 #include <QWebFrame>
 #include <QImage>
 #include <QPainter>
-#include "terminal.h"
 
 class WebPage: public QWebPage
 {

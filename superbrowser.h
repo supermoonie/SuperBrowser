@@ -13,7 +13,6 @@
 #include <QNetworkProxyFactory>
 #include "webpage.h"
 #include "memorycookiejar.h"
-#include "receivethread.h"
 #include "networkaccessmanager.h"
 
 class SuperBrowser: public QObject
@@ -25,7 +24,6 @@ public:
     ~SuperBrowser();
 
 private:
-    ReceiveThread* receiveThread;
     MemoryCookieJar* cookieJar;
     NetworkAccessManager* networkAccessManager;
     WebPage* webPage;
@@ -58,7 +56,7 @@ private:
     // extractor operation
 
 private slots:
-    void onCommandReceived(const QString &rawCommand);
+
 };
 
 #endif // SUPERBROWSER_H

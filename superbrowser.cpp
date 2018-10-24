@@ -19,9 +19,6 @@ SuperBrowser::SuperBrowser(QObject* parent): QObject(parent)
     commandMap.insert("addExtractors", &SuperBrowser::addExtractors);
     commandMap.insert("getResponse", &SuperBrowser::getResponse);
     commandMap.insert("getResponses", &SuperBrowser::getResponses);
-    receiveThread = new ReceiveThread(NULL);
-    connect(receiveThread, &ReceiveThread::received, this, &SuperBrowser::onCommandReceived);
-    receiveThread->start();
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 }
 
@@ -31,7 +28,6 @@ SuperBrowser::~SuperBrowser()
 }
 
 void SuperBrowser::close() {
-    receiveThread->stop();
     QApplication::exit(0);
 }
 
@@ -263,45 +259,4 @@ void SuperBrowser::deleteCookies(QJsonObject &in, QJsonObject *out) {
         QString name = cookieJson.value("name").toString();
         out->insert(name, flag);
     }
-}
-
-void SuperBrowser::onCommandReceived(const QString &rawCommand) {
-    QJsonParseError * parseError = new QJsonParseError;
-    QJsonDocument commandJsonDocument = QJsonDocument::fromJson(rawCommand.toUtf8(), parseError);
-    if(parseError->error != QJsonParseError::NoError)
-    {
-        QJsonObject errorJson;
-        errorJson.insert("code", 400);
-        errorJson.insert("desc", parseError->errorString());
-        errorJson.insert("data", QJsonValue::Null);
-        Terminal::instance()->cout(QString(QJsonDocument(errorJson).toJson()), true);
-        return;
-    }
-    QJsonObject commandJson = commandJsonDocument.object();
-    QString name = commandJson.value("name").toString();
-    if(name.isNull() || name.isEmpty()) {
-        QJsonObject errorJson;
-        errorJson.insert("code", 400);
-        errorJson.insert("desc", "name lost");
-        errorJson.insert("data", QJsonValue::Null);
-        Terminal::instance()->cout(QString(QJsonDocument(errorJson).toJson()), true);
-        return;
-    }
-    if("close" == name) {
-        this->close();
-        return;
-    }
-    if(!commandMap.contains(name)) {
-        QJsonObject errorJson;
-        errorJson.insert("code", 404);
-        errorJson.insert("desc", name + " not support");
-        errorJson.insert("data", QJsonValue::Null);
-        Terminal::instance()->cout(QString(QJsonDocument(errorJson).toJson()), true);
-        return;
-    }
-    FUN fun = commandMap.value(name);
-    QJsonObject* result = new QJsonObject;
-    (this->*fun)(commandJson, result);
-    Terminal::instance()->cout(QString(QJsonDocument(*result).toJson()), true);
-    delete result;
 }

@@ -7,7 +7,7 @@
 #include <QMainWindow>
 #include "tcpserver.h"
 #include "webpage.h"
-#include <proxydialog.h>
+#include "proxydialog.h"
 
 class MainWindow : public QMainWindow
 {
