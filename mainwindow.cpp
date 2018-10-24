@@ -5,6 +5,7 @@
 #include <QMenuBar>
 #include <QAction>
 #include <QInputDialog>
+#include <QNetworkProxy>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -39,6 +40,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(stopTcpAction, &QAction::triggered, this, &MainWindow::onStopTcpActionTriggered);
     tcpMenu->addAction(stopTcpAction);
 
+    QMenu* settingsMenu = menuBar()->addMenu("Settings");
+    QAction* proxyAction = new QAction("Proxy", this);
+    settingsMenu->addAction(proxyAction);
+
     setCentralWidget(view);
     setUnifiedTitleAndToolBarOnMac(true);
 }
@@ -51,6 +56,15 @@ MainWindow::~MainWindow()
 void MainWindow::changeLocation() {
     QUrl url = QUrl::fromUserInput(locationEdit->text());
     view->setUrl(url);
+}
+
+void MainWindow::onProxyActionTriggered() {
+    QNetworkProxy proxy = QNetworkProxy::applicationProxy();
+    QString host;
+    int port;
+    if(NULL == proxy) {
+
+    }
 }
 
 void MainWindow::onStartTcpActionTriggered() {

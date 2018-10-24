@@ -27,7 +27,8 @@ SOURCES += main.cpp \
     networkaccessmanager.cpp \
     mainwindow.cpp \
     tcpserver.cpp \
-    config.cpp
+    config.cpp \
+    proxydialog.cpp
 
 HEADERS += \
     terminal.h \
@@ -39,4 +40,8 @@ HEADERS += \
     networkaccessmanager.h \
     mainwindow.h \
     tcpserver.h \
-    config.h
+    config.h \
+    proxydialog.h
+
+FORMS += \
+    proxydialog.ui

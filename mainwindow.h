@@ -31,6 +31,7 @@ private slots:
     void onStartTcpActionTriggered();
     void onStopTcpActionTriggered();
     void onWebPageLoadStarted();
+    void onProxyActionTriggered();
 
 signals:
 
