@@ -42,7 +42,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     QMenu* settingsMenu = menuBar()->addMenu("Settings");
     QAction* proxyAction = new QAction("Proxy", this);
+    connect(proxyAction, &QAction::triggered, this, &MainWindow::onProxyActionTriggered);
     settingsMenu->addAction(proxyAction);
+
+    proxyDialog = new ProxyDialog(this);
 
     setCentralWidget(view);
     setUnifiedTitleAndToolBarOnMac(true);
@@ -60,11 +63,7 @@ void MainWindow::changeLocation() {
 
 void MainWindow::onProxyActionTriggered() {
     QNetworkProxy proxy = QNetworkProxy::applicationProxy();
-    QString host;
-    int port;
-    if(NULL == proxy) {
-
-    }
+    proxyDialog->show();
 }
 
 void MainWindow::onStartTcpActionTriggered() {

@@ -7,6 +7,7 @@
 #include <QMainWindow>
 #include "tcpserver.h"
 #include "webpage.h"
+#include <proxydialog.h>
 
 class MainWindow : public QMainWindow
 {
@@ -25,6 +26,7 @@ private:
     QAction* stopTcpAction;
     int progress;
     TcpServer* tcpServer;
+    ProxyDialog* proxyDialog;
 
 private slots:
     void changeLocation();

@@ -15,6 +15,11 @@ public:
     explicit ProxyDialog(QWidget *parent = 0);
     ~ProxyDialog();
 
+private slots:
+
+
+    void on_buttons_accepted();
+
 private:
     Ui::ProxyDialog *ui;
 };
