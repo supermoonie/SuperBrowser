@@ -7,7 +7,7 @@
 QT       += core gui webkitwidgets widgets
 
 CONFIG += C++11
-QT.testlib.CONFIG -= console
+CONFIG += console
 
 TARGET = SuperSpider
 TEMPLATE = app
@@ -19,7 +19,9 @@ SOURCES += main.cpp \
     networkaccessmanager.cpp \
     mainwindow.cpp \
     tcpserver.cpp \
-    proxydialog.cpp
+    proxydialog.cpp \
+    interceptordialog.cpp \
+    edittableview.cpp
 
 HEADERS += \
     memorycookiejar.h \
@@ -28,7 +30,10 @@ HEADERS += \
     networkaccessmanager.h \
     mainwindow.h \
     tcpserver.h \
-    proxydialog.h
+    proxydialog.h \
+    interceptordialog.h \
+    edittableview.h
 
 FORMS += \
-    proxydialog.ui
+    proxydialog.ui \
+    interceptordialog.ui

@@ -17,6 +17,7 @@ WebPage::WebPage(QObject* parent): QWebPage(parent)
     settings->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     commandMap.insert("navigate", &WebPage::navigate);
     commandMap.insert("setProxy", &WebPage::setProxy);
+    commandMap.insert("setUserAgent", &WebPage::setUserAgent);
 }
 
 WebPage::~WebPage()
@@ -53,9 +54,9 @@ void WebPage::setProxy(QJsonObject &in, QJsonObject &out) {
         int port = proxyJson.value("port").toInt();
         proxy.setHostName(host);
         proxy.setPort(port);
-        QString user = in.value("user").toString();
-        if(!user.isNull() && !user.isEmpty()) {
-            proxy.setUser(user);
+        QString username = in.value("username").toString();
+        if(!username.isNull() && !username.isEmpty()) {
+            proxy.setUser(username);
         }
         QString password = in.value("password").toString();
         if(!password.isNull() && !password.isEmpty()) {
@@ -63,6 +64,14 @@ void WebPage::setProxy(QJsonObject &in, QJsonObject &out) {
         }
     }
     QNetworkProxy::setApplicationProxy(proxy);
+}
+
+void WebPage::setUserAgent(QJsonObject &in, QJsonObject &out) {
+    QJsonObject userAgentJson = in.value("parameters").toObject();
+    QString ua = userAgentJson.value("userAgent").toString();
+    if(!ua.isEmpty()) {
+        setUserAgent(ua);
+    }
 }
 
 QImage WebPage::renderImage() {

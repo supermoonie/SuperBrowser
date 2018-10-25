@@ -30,6 +30,7 @@ private:
 private:
     void navigate(QJsonObject &in, QJsonObject &out);
     void setProxy(QJsonObject &in, QJsonObject &out);
+    void setUserAgent(QJsonObject &in, QJsonObject &out);
 
 signals:
     void commandProcessed(QByteArray &data);

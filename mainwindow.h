@@ -8,6 +8,7 @@
 #include "tcpserver.h"
 #include "webpage.h"
 #include "proxydialog.h"
+#include "interceptordialog.h"
 
 class MainWindow : public QMainWindow
 {
@@ -27,13 +28,20 @@ private:
     int progress;
     TcpServer* tcpServer;
     ProxyDialog* proxyDialog;
+    InterceptorDialog* interceptorDialog;
 
 private slots:
     void changeLocation();
+    void onWebPageLoadStarted();
+    void onWebPageLoadFinished();
+    void onWebViewLoadProgress(int p);
+    void onWebViewTitleChanged();
     void onStartTcpActionTriggered();
     void onStopTcpActionTriggered();
-    void onWebPageLoadStarted();
     void onProxyActionTriggered();
+    void onProxyDialogAccpted();
+    void onUserAgentActionTriggered();
+    void onInterceptorActionTriggered();
 
 signals:
 
