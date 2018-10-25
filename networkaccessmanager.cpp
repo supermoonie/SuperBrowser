@@ -14,17 +14,19 @@ NetworkAccessManager::~NetworkAccessManager()
 }
 
 QNetworkReply* NetworkAccessManager::createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData) {
-    QString url = request.url().toString();
+//    QString url = request.url().toString();
 
-    if(!this->interceptor.isEmpty() && url.contains(this->interceptor))
-    {
-        QNetworkRequest req;
-        req.setUrl(QUrl(""));
-        return QNetworkAccessManager::createRequest(op, req, outgoingData);
-    }
-    QString path = request.url().path();
+//    if(!this->interceptor.isEmpty() && url.contains(this->interceptor))
+//    {
+//        QNetworkRequest req;
+//        req.setUrl(QUrl(""));
+//        return QNetworkAccessManager::createRequest(op, req, outgoingData);
+//    }
+//    QString path = request.url().path();
+    QUrl url = request.url();
     if(op != GetOperation && outgoingData != NULL) {
         QByteArray data = readOutgoingData(outgoingData);
+        if(url.hasQuery())
         path.append("?").append(data);
     }
     QNetworkReply * reply = QNetworkAccessManager::createRequest(op, request, outgoingData);
@@ -133,7 +135,7 @@ bool NetworkAccessManager::match(const QUrl url) {
             continue;
         }
         if(interceptor.startsWith("http")) {
-
+            QString
         }
     }
 }
