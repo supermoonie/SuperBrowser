@@ -1,6 +1,5 @@
 #include "interceptordialog.h"
 #include "ui_interceptordialog.h"
-#include <QDebug>
 
 InterceptorDialog::InterceptorDialog(QWidget *parent) :
     QDialog(parent),
@@ -17,12 +16,34 @@ InterceptorDialog::~InterceptorDialog()
     delete ui;
 }
 
-void InterceptorDialog::on_addButton_clicked()
-{
-    ui->listWidget->addItem("NULL");
+QList<QString> InterceptorDialog::getInterceptors() {
+    QList<QString> list;
     int count = ui->listWidget->count();
-    qDebug() << count;
-    QListWidgetItem* lastItem = ui->listWidget->item(count - 1);
-    lastItem->setFlags(lastItem->flags() | Qt::ItemIsEditable);
-    lastItem->listWidget()->setEditTriggers(QAbstractItemView::DoubleClicked);
+    for(int i = 0; i < count; i ++) {
+        QListWidgetItem* item = ui->listWidget->item(i);
+        QString text = item->text();
+        if(text == "NULL" || text.isEmpty()) {
+            continue;
+        }
+        list.append(text);
+    }
+    return list;
+}
+
+void InterceptorDialog::on_addButton_clicked() {
+    ui->listWidget->addItem("NULL");
+    ui->listWidget->setCurrentRow(ui->listWidget->count() - 1);
+}
+
+void InterceptorDialog::on_removeButton_clicked() {
+    ui->listWidget->takeItem(ui->listWidget->currentRow());
+}
+
+void InterceptorDialog::on_clearButton_clicked() {
+    ui->listWidget->clear();
+}
+
+void InterceptorDialog::on_okButton_clicked() {
+    this->close();
+    emit accepted();
 }

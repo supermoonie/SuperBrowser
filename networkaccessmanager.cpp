@@ -15,6 +15,7 @@ NetworkAccessManager::~NetworkAccessManager()
 
 QNetworkReply* NetworkAccessManager::createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData) {
     QString url = request.url().toString();
+
     if(!this->interceptor.isEmpty() && url.contains(this->interceptor))
     {
         QNetworkRequest req;
@@ -55,6 +56,10 @@ QNetworkReply* NetworkAccessManager::createRequest(Operation op, const QNetworkR
         }
     }
     return QNetworkAccessManager::createRequest(op, request, outgoingData);
+}
+
+bool NetworkAccessManager::setInterceptors(const QList<QString> &interceptors) {
+    this->interceptors = interceptors;
 }
 
 bool NetworkAccessManager::setInterceptor(const QRegExp &interceptor) {
@@ -116,4 +121,19 @@ QByteArray NetworkAccessManager::readOutgoingData(QIODevice *outgoingData) {
         delete[] buffer;
     }
     return data;
+}
+
+bool NetworkAccessManager::match(const QUrl url) {
+    if(interceptors.isEmpty() || url.isEmpty()) {
+        return false;
+    }
+    for(int i = 0; i < interceptors.size(); i ++) {
+        QString interceptor = interceptors[i];
+        if(interceptor.isEmpty()) {
+            continue;
+        }
+        if(interceptor.startsWith("http")) {
+
+        }
+    }
 }

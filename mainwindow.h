@@ -36,6 +36,7 @@ private slots:
     void onWebPageLoadFinished();
     void onWebViewLoadProgress(int p);
     void onWebViewTitleChanged();
+    void onInterceptorDialogAccepted();
     void onStartTcpActionTriggered();
     void onStopTcpActionTriggered();
     void onProxyActionTriggered();

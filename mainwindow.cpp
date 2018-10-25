@@ -61,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(proxyDialog, &ProxyDialog::accepted, this, &MainWindow::onProxyDialogAccpted);
 
     interceptorDialog = new InterceptorDialog(this);
+    connect(interceptorDialog, &InterceptorDialog::accepted, this, &MainWindow::onInterceptorDialogAccepted);
 
     setCentralWidget(view);
     setUnifiedTitleAndToolBarOnMac(true);
@@ -69,6 +70,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::onInterceptorDialogAccepted() {
+    QList<QString> interceptors = interceptorDialog->getInterceptors();
+    for(int i = 0; i < interceptors.size(); i ++) {
+        qDebug() << interceptors[i];
+    }
 }
 
 void MainWindow::onInterceptorActionTriggered() {
