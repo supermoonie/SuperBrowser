@@ -4,11 +4,12 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkProxy>
+#include <QDebug>
 
-WebPage::WebPage(QObject* parent): QWebPage(parent)
+WebPage::WebPage(QObject* parent):
+    QWebPage(parent),
+    userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36")
 {
-    userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36";
-    this->setViewportSize(QSize(980, 900));
     QWebSettings * settings = QWebSettings::globalSettings();
     settings->setAttribute(QWebSettings::OfflineStorageDatabaseEnabled, true);
     settings->setAttribute(QWebSettings::OfflineWebApplicationCacheEnabled, false);
@@ -113,7 +114,7 @@ QImage WebPage::renderImage() {
     return buffer;
 }
 
-void WebPage::onCommandReceived(const QString &command) {
+void WebPage::onCommandReceived(QWebSocket* client, const QString &command) {
     QJsonParseError* parseError = new QJsonParseError;
     QJsonDocument commandJsonDocument = QJsonDocument::fromJson(command.toUtf8(), parseError);
     if(parseError->error != QJsonParseError::NoError)
@@ -121,7 +122,8 @@ void WebPage::onCommandReceived(const QString &command) {
         QJsonObject errorJson;
         errorJson.insert("error", parseError->errorString());
         QByteArray errorResult = QJsonDocument(errorJson).toJson();
-        emit commandProcessed(errorResult);
+        client->sendTextMessage(QString(errorResult));
+        client->flush();
         return;
     }
     QJsonObject commandJson = commandJsonDocument.object();
@@ -130,19 +132,22 @@ void WebPage::onCommandReceived(const QString &command) {
         QJsonObject errorJson;
         errorJson.insert("error", "name lost");
         QByteArray errorResult = QJsonDocument(errorJson).toJson();
-        emit commandProcessed(errorResult);
+        client->sendTextMessage(QString(errorResult));
+        client->flush();
         return;
     }
     if(!commandMap.contains(name)) {
         QJsonObject errorJson;
         errorJson.insert("error", name + " not support");
         QByteArray errorResult = QJsonDocument(errorJson).toJson();
-        emit commandProcessed(errorResult);
+        client->sendTextMessage(QString(errorResult));
+        client->flush();
         return;
     }
     FUN fun = commandMap.value(name);
     QJsonObject result;
     (this->*fun)(commandJson, result);
     QByteArray resultData = QJsonDocument(result).toJson();
-    emit commandProcessed(resultData);
+    client->sendTextMessage(QString(resultData));
+    client->flush();
 }

@@ -8,16 +8,15 @@
 #include <QNetworkProxy>
 #include <QDebug>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    progress(0)
 {
-    progress = 0;
-    tcpServer = new TcpServer(this);
-    connect(tcpServer, &TcpServer::newConnection, tcpServer, &TcpServer::onNewConnection);
+    webSocketServer = new WebSocketServer(this);
     view = new QWebView(this);
     webPage = new WebPage(this);
     view->setPage(webPage);
-    connect(tcpServer, &TcpServer::commandReceived, webPage, &WebPage::onCommandReceived);
-    connect(webPage, &WebPage::commandProcessed, tcpServer, &TcpServer::write);
+    connect(webSocketServer, &WebSocketServer::commandReceived, webPage, &WebPage::onCommandReceived);
     connect(webPage, &WebPage::loadStarted, this, &MainWindow::onWebPageLoadStarted);
     connect(webPage, &WebPage::loadFinished, this, &MainWindow::onWebPageLoadFinished);
     connect(view, &QWebView::titleChanged, this, &MainWindow::onWebViewTitleChanged);
@@ -34,15 +33,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     toolBar->addAction(view->pageAction(QWebPage::Stop));
     toolBar->addWidget(locationEdit);
 
-    QMenu* tcpMenu = menuBar()->addMenu("TcpServer");
-    startTcpAction = new QAction("Start", this);
-    connect(startTcpAction, &QAction::triggered, this, &MainWindow::onStartTcpActionTriggered);
-    tcpMenu->addAction(startTcpAction);
+    QMenu* serverMenu = menuBar()->addMenu("Server");
+    startAction = new QAction("Start", this);
+    connect(startAction, &QAction::triggered, this, &MainWindow::onStartActionTriggered);
+    serverMenu->addAction(startAction);
 
-    stopTcpAction = new QAction("Stop", this);
-    stopTcpAction->setDisabled(true);
-    connect(stopTcpAction, &QAction::triggered, this, &MainWindow::onStopTcpActionTriggered);
-    tcpMenu->addAction(stopTcpAction);
+    stopAction = new QAction("Stop", this);
+    stopAction->setDisabled(true);
+    connect(stopAction, &QAction::triggered, this, &MainWindow::onStopActionTriggered);
+    serverMenu->addAction(stopAction);
 
     QMenu* settingsMenu = menuBar()->addMenu("Settings");
     QAction* proxyAction = new QAction("Proxy", this);
@@ -130,31 +129,23 @@ void MainWindow::onProxyActionTriggered() {
     proxyDialog->show();
 }
 
-void MainWindow::onStartTcpActionTriggered() {
+void MainWindow::onStartActionTriggered() {
     int port = QInputDialog::getInt(this, "port", "port", 9900, 1000, 100000, 10);
-    bool tcpServerStarted = startTcpServer(port);
-    if(!tcpServerStarted) {
+    if(!webSocketServer->listen(QHostAddress::Any, port)) {
         QMessageBox::warning(this, "warn", QString("could not listen on %1!").arg(port));
     } else {
-        startTcpAction->setDisabled(true);
-        stopTcpAction->setEnabled(true);
+        startAction->setDisabled(true);
+        stopAction->setEnabled(true);
     }
 }
 
-void MainWindow::onStopTcpActionTriggered() {
-    tcpServer->close();
-    startTcpAction->setEnabled(true);
-    stopTcpAction->setDisabled(true);
+void MainWindow::onStopActionTriggered() {
+    webSocketServer->close();
+    startAction->setEnabled(true);
+    stopAction->setDisabled(true);
 }
 
 void MainWindow::onWebPageLoadStarted() {
     QUrl currentUrl = webPage->currentFrame()->url();
     locationEdit->setText(currentUrl.toString());
-}
-
-bool MainWindow::startTcpServer(int port) {
-    if(!tcpServer->listen(QHostAddress::Any, port)) {
-        return false;
-    }
-    return true;
 }

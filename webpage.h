@@ -5,6 +5,7 @@
 #include <QWebFrame>
 #include <QImage>
 #include <QPainter>
+#include <QWebSocket>
 
 class WebPage: public QWebPage
 {
@@ -36,7 +37,7 @@ signals:
     void commandProcessed(QByteArray &data);
 
 public slots:
-    void onCommandReceived(const QString &command);
+    void onCommandReceived(QWebSocket* client, const QString &command);
 
 };
 

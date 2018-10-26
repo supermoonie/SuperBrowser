@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui webkitwidgets widgets
+QT += core gui webkitwidgets widgets
+QT += websockets
 
 CONFIG += C++11
 CONFIG += console
@@ -18,10 +19,9 @@ SOURCES += main.cpp \
     webpage.cpp \
     networkaccessmanager.cpp \
     mainwindow.cpp \
-    tcpserver.cpp \
     proxydialog.cpp \
     interceptordialog.cpp \
-    edittableview.cpp
+    websocketserver.cpp
 
 HEADERS += \
     memorycookiejar.h \
@@ -29,10 +29,9 @@ HEADERS += \
     webpage.h \
     networkaccessmanager.h \
     mainwindow.h \
-    tcpserver.h \
     proxydialog.h \
     interceptordialog.h \
-    edittableview.h
+    websocketserver.h
 
 FORMS += \
     proxydialog.ui \

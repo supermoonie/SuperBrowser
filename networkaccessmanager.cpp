@@ -22,11 +22,9 @@ QNetworkReply* NetworkAccessManager::createRequest(Operation op, const QNetworkR
 //        req.setUrl(QUrl(""));
 //        return QNetworkAccessManager::createRequest(op, req, outgoingData);
 //    }
-//    QString path = request.url().path();
-    QUrl url = request.url();
+    QString path = request.url().path();
     if(op != GetOperation && outgoingData != NULL) {
         QByteArray data = readOutgoingData(outgoingData);
-        if(url.hasQuery())
         path.append("?").append(data);
     }
     QNetworkReply * reply = QNetworkAccessManager::createRequest(op, request, outgoingData);
@@ -60,7 +58,7 @@ QNetworkReply* NetworkAccessManager::createRequest(Operation op, const QNetworkR
     return QNetworkAccessManager::createRequest(op, request, outgoingData);
 }
 
-bool NetworkAccessManager::setInterceptors(const QList<QString> &interceptors) {
+void NetworkAccessManager::setInterceptors(const QList<QString> &interceptors) {
     this->interceptors = interceptors;
 }
 
@@ -135,7 +133,7 @@ bool NetworkAccessManager::match(const QUrl url) {
             continue;
         }
         if(interceptor.startsWith("http")) {
-            QString
+
         }
     }
 }

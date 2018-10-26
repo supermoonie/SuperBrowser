@@ -5,7 +5,7 @@
 #include <QWebView>
 #include <QLineEdit>
 #include <QMainWindow>
-#include "tcpserver.h"
+#include "websocketserver.h"
 #include "webpage.h"
 #include "proxydialog.h"
 #include "interceptordialog.h"
@@ -16,17 +16,16 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    bool startTcpServer(int port);
 
 private:
     QWebView *view;
     WebPage* webPage;
     QLineEdit *locationEdit;
     QAction *rotateAction;
-    QAction* startTcpAction;
-    QAction* stopTcpAction;
+    QAction* startAction;
+    QAction* stopAction;
     int progress;
-    TcpServer* tcpServer;
+    WebSocketServer* webSocketServer;
     ProxyDialog* proxyDialog;
     InterceptorDialog* interceptorDialog;
 
@@ -37,8 +36,8 @@ private slots:
     void onWebViewLoadProgress(int p);
     void onWebViewTitleChanged();
     void onInterceptorDialogAccepted();
-    void onStartTcpActionTriggered();
-    void onStopTcpActionTriggered();
+    void onStartActionTriggered();
+    void onStopActionTriggered();
     void onProxyActionTriggered();
     void onProxyDialogAccpted();
     void onUserAgentActionTriggered();
