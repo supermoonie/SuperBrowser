@@ -21,7 +21,7 @@ super browser
 - 日志输出
 
 ```json
-{"name":"navigate","parameters":{"url":"http://pianke.me/"}}
+{"name":"navigate","parameters":{"url":"https://ip.cn"}}
 
 {"name":"setProxy","parameters":{"host":"127.0.0.1","port":8888,"user":"","password":"","type":"http"}}
 
@@ -43,8 +43,7 @@ super browser
 
 {"name":"deleteCookies","parameters":[{"name":"cookieName1","url":"https://www.baidu.com/"},{"name":"cookieName2","url":"https://www.baidu.com/"}]}
 
-{"name":"addExtractor","parameters":".*(interested.php).*"}
-{"name":"addExtractors","parameters":[".*(interested.php).*",".*(day.php).*"]}
+{"name":"setInterceptors","parameters":["https://s.ip-cdn.com/img/logo.gif"]}
 
 {"name":"getResponse","parameters":".*(day.php).*"}
 {"name":"getResponses","parameters":[".*(interested.php).*",".*(day.php).*"]}
