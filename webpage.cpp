@@ -10,6 +10,9 @@ WebPage::WebPage(QObject* parent):
     QWebPage(parent),
     userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36")
 {
+    cookieJar = new MemoryCookieJar(this);
+    networkAccessManager = new NetworkAccessManager(cookieJar, this);
+    this->setNetworkAccessManager(networkAccessManager);
     QWebSettings * settings = QWebSettings::globalSettings();
     settings->setAttribute(QWebSettings::OfflineStorageDatabaseEnabled, true);
     settings->setAttribute(QWebSettings::OfflineWebApplicationCacheEnabled, false);
@@ -19,6 +22,7 @@ WebPage::WebPage(QObject* parent):
     commandMap.insert("navigate", &WebPage::navigate);
     commandMap.insert("setProxy", &WebPage::setProxy);
     commandMap.insert("setUserAgent", &WebPage::setUserAgent);
+    commandMap.insert("setInterceptors", &WebPage::setInterceptors);
 }
 
 WebPage::~WebPage()
@@ -28,6 +32,10 @@ WebPage::~WebPage()
 
 void WebPage::setUserAgent(const QString &ua) {
     this->userAgent = ua;
+}
+
+QString WebPage::getUserAgent() {
+    return this->userAgent;
 }
 
 QString WebPage::userAgentForUrl(const QUrl &url) const {
@@ -75,6 +83,29 @@ void WebPage::setUserAgent(QJsonObject &in, QJsonObject &out) {
     }
 }
 
+void WebPage::setInterceptors(QJsonObject &in, QJsonObject &out) {
+    QJsonArray interceptorsArr = in.value("parameters").toArray();
+    QList<QString> interceptors;
+    for(int i = 0; i < interceptorsArr.size(); i ++) {
+        QString interceptor = interceptorsArr.at(i).toString("");
+        if(interceptor.isEmpty()) {
+            continue;
+        }
+        interceptors.append(interceptor);
+    }
+    if(interceptors.size() > 0) {
+        setInterceptors(interceptors);
+    }
+}
+
+QList<QString> WebPage::getInterceptors() {
+    return networkAccessManager->getInterceptors();
+}
+
+void WebPage::setInterceptors(const QList<QString> &interceptors) {
+    networkAccessManager->setInterceptors(interceptors);
+}
+
 QImage WebPage::renderImage() {
     QRect frameRect;
     QSize viewportSize = this->viewportSize();
@@ -117,8 +148,7 @@ QImage WebPage::renderImage() {
 void WebPage::onCommandReceived(QWebSocket* client, const QString &command) {
     QJsonParseError* parseError = new QJsonParseError;
     QJsonDocument commandJsonDocument = QJsonDocument::fromJson(command.toUtf8(), parseError);
-    if(parseError->error != QJsonParseError::NoError)
-    {
+    if(parseError->error != QJsonParseError::NoError) {
         QJsonObject errorJson;
         errorJson.insert("error", parseError->errorString());
         QByteArray errorResult = QJsonDocument(errorJson).toJson();

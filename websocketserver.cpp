@@ -1,5 +1,4 @@
 #include "websocketserver.h"
-#include <QDebug>
 
 WebSocketServer::WebSocketServer(QObject *parent) :
     QWebSocketServer("BrowserServer", QWebSocketServer::NonSecureMode, parent)
@@ -21,7 +20,6 @@ void WebSocketServer::onNewConnection() {
 
 void WebSocketServer::onTextMessageReceived(QString message) {
     QWebSocket* client = qobject_cast<QWebSocket*>(sender());
-    qDebug() << "in <<<< " << message;
     if(client) {
         emit commandReceived(client, message);
     }

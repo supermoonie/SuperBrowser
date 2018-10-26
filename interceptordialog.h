@@ -17,6 +17,7 @@ public:
     explicit InterceptorDialog(QWidget *parent = 0);
     ~InterceptorDialog();
     QList<QString> getInterceptors();
+    void setInterceptors(const QList<QString> &interceptors);
 
 private:
     Ui::InterceptorDialog *ui;

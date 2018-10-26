@@ -30,6 +30,13 @@ QList<QString> InterceptorDialog::getInterceptors() {
     return list;
 }
 
+void InterceptorDialog::setInterceptors(const QList<QString> &interceptors) {
+    for(int i = 0; i < interceptors.size(); i ++) {
+        QString interceptor = interceptors[i];
+        ui->listWidget->addItem(interceptor);
+    }
+}
+
 void InterceptorDialog::on_addButton_clicked() {
     ui->listWidget->addItem("NULL");
     ui->listWidget->setCurrentRow(ui->listWidget->count() - 1);

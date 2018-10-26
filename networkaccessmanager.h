@@ -20,6 +20,7 @@ public:
 public:
     bool setInterceptor(const QRegExp &interceptor);
     void setInterceptors(const QList<QString> &interceptors);
+    QList<QString> getInterceptors();
     bool addExtractor(const QRegExp &extractor);
     QByteArray extract(const QRegExp &extractor);
 
@@ -33,7 +34,8 @@ private:
 
 private:
     QByteArray readOutgoingData(QIODevice* outgoingData);
-    bool match(const QUrl url);
+    bool matchWillBeIntercept(const QUrl url);
+    bool matchWillBeExtract(const QUrl url);
 
 signals:
 

@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     toolBar->addAction(view->pageAction(QWebPage::Stop));
     toolBar->addWidget(locationEdit);
 
+    // Server
     QMenu* serverMenu = menuBar()->addMenu("Server");
     startAction = new QAction("Start", this);
     connect(startAction, &QAction::triggered, this, &MainWindow::onStartActionTriggered);
@@ -42,7 +43,9 @@ MainWindow::MainWindow(QWidget *parent) :
     stopAction->setDisabled(true);
     connect(stopAction, &QAction::triggered, this, &MainWindow::onStopActionTriggered);
     serverMenu->addAction(stopAction);
+    // Server
 
+    // Settings
     QMenu* settingsMenu = menuBar()->addMenu("Settings");
     QAction* proxyAction = new QAction("Proxy", this);
     connect(proxyAction, &QAction::triggered, this, &MainWindow::onProxyActionTriggered);
@@ -61,6 +64,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     interceptorDialog = new InterceptorDialog(this);
     connect(interceptorDialog, &InterceptorDialog::accepted, this, &MainWindow::onInterceptorDialogAccepted);
+    // Settings
+
+    // Cookie
+    QMenu* cookieMenu = menuBar()->addMenu("Cookie");
+    QAction* getCookieAction = new QAction("GetCookie", this);
+    connect(getCookieAction, &QAction::triggered, this, &MainWindow::onGetCookieActionTriggered);
+    cookieMenu->addAction(getCookieAction);
+    // Cookie
 
     setCentralWidget(view);
     setUnifiedTitleAndToolBarOnMac(true);
@@ -71,14 +82,20 @@ MainWindow::~MainWindow()
 
 }
 
+void MainWindow::onGetCookieActionTriggered() {
+    QMessageBox::information(this, "中文标题", "中文内容");
+}
+
 void MainWindow::onInterceptorDialogAccepted() {
     QList<QString> interceptors = interceptorDialog->getInterceptors();
-    for(int i = 0; i < interceptors.size(); i ++) {
-        qDebug() << interceptors[i];
+    if(interceptors.size() > 0) {
+        webPage->setInterceptors(interceptors);
     }
 }
 
 void MainWindow::onInterceptorActionTriggered() {
+    QList<QString> interceptros = webPage->getInterceptors();
+    interceptorDialog->setInterceptors(interceptros);
     interceptorDialog->show();
 }
 
@@ -105,9 +122,9 @@ void MainWindow::onWebViewTitleChanged() {
 }
 
 void MainWindow::onUserAgentActionTriggered() {
-    QString userAgent = QInputDialog::getText(this, "User-Agent", "User-Agent: ");
+    QString currentUserAgent = webPage->getUserAgent();
+    QString userAgent = QInputDialog::getText(this, "User-Agent", "User-Agent: ", QLineEdit::Normal, currentUserAgent);
     if(userAgent.isEmpty()) {
-        QMessageBox::warning(this, "Warning", "User-Agent is empty!");
         return;
     }
     webPage->setUserAgent(userAgent);

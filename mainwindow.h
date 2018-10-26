@@ -42,6 +42,8 @@ private slots:
     void onProxyDialogAccpted();
     void onUserAgentActionTriggered();
     void onInterceptorActionTriggered();
+    // Cookie
+    void onGetCookieActionTriggered();
 
 signals:
 
