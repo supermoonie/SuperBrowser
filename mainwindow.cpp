@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent) :
     toolBar->addWidget(locationEdit);
 
     // Server
+    serverDialog = new ServerDialog(this);
+    connect(serverDialog, &ServerDialog::accepted, this, &MainWindow::onServerDialogAccepted);
     QMenu* serverMenu = menuBar()->addMenu("Server");
     startAction = new QAction("Start", this);
     connect(startAction, &QAction::triggered, this, &MainWindow::onStartActionTriggered);
@@ -72,6 +74,22 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(getCookieAction, &QAction::triggered, this, &MainWindow::onGetCookieActionTriggered);
     cookieMenu->addAction(getCookieAction);
     // Cookie
+
+    // Network
+    setExtractorsDialog = new SetExtractorsDialog(this);
+    connect(setExtractorsDialog, &SetExtractorsDialog::extractorChanged, [=](QMap<QString, QString> &extractorItems){
+        webPage->getNetworkAccessManager()->setExtractorMap(extractorItems);
+    });
+    connect(webPage->getNetworkAccessManager(), &NetworkAccessManager::dataExtracted, [=](const QString &extractor, const QString &base64Data){
+        setExtractorsDialog->updateModel(extractor, base64Data);
+    });
+    QMenu* networkMenu = menuBar()->addMenu("Network");
+    QAction* setExtractorsAction = new QAction("SetExtractors", this);
+    connect(setExtractorsAction, &QAction::triggered, [=](){
+        setExtractorsDialog->show();
+    });
+    networkMenu->addAction(setExtractorsAction);
+    // Network
 
     setCentralWidget(view);
     setUnifiedTitleAndToolBarOnMac(true);
@@ -146,8 +164,9 @@ void MainWindow::onProxyActionTriggered() {
     proxyDialog->show();
 }
 
-void MainWindow::onStartActionTriggered() {
-    int port = QInputDialog::getInt(this, "port", "port", 9900, 1000, 100000, 10);
+// Server
+void MainWindow::onServerDialogAccepted() {
+    int port = serverDialog->getPort();
     if(!webSocketServer->listen(QHostAddress::Any, port)) {
         QMessageBox::warning(this, "warn", QString("could not listen on %1!").arg(port));
     } else {
@@ -156,11 +175,17 @@ void MainWindow::onStartActionTriggered() {
     }
 }
 
+void MainWindow::onStartActionTriggered() {
+    serverDialog->show();
+}
+
 void MainWindow::onStopActionTriggered() {
+    webSocketServer->disconnect();
     webSocketServer->close();
     startAction->setEnabled(true);
     stopAction->setDisabled(true);
 }
+// Server
 
 void MainWindow::onWebPageLoadStarted() {
     QUrl currentUrl = webPage->currentFrame()->url();

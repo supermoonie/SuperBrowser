@@ -9,6 +9,8 @@
 #include "webpage.h"
 #include "proxydialog.h"
 #include "interceptordialog.h"
+#include "serverdialog.h"
+#include "setextractorsdialog.h"
 
 class MainWindow : public QMainWindow
 {
@@ -28,6 +30,8 @@ private:
     WebSocketServer* webSocketServer;
     ProxyDialog* proxyDialog;
     InterceptorDialog* interceptorDialog;
+    ServerDialog* serverDialog;
+    SetExtractorsDialog* setExtractorsDialog;
 
 private slots:
     void changeLocation();
@@ -36,8 +40,13 @@ private slots:
     void onWebViewLoadProgress(int p);
     void onWebViewTitleChanged();
     void onInterceptorDialogAccepted();
+
+    // Server
+    void onServerDialogAccepted();
     void onStartActionTriggered();
     void onStopActionTriggered();
+    // Server
+
     void onProxyActionTriggered();
     void onProxyDialogAccpted();
     void onUserAgentActionTriggered();

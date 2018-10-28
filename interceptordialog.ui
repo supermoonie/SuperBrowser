@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Interceptor Setting</string>
   </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="3">
     <widget class="QPushButton" name="okButton">

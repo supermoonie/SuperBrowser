@@ -18,26 +18,24 @@ public:
     ~NetworkAccessManager();
 
 public:
-    bool setInterceptor(const QRegExp &interceptor);
     void setInterceptors(const QList<QString> &interceptors);
     QList<QString> getInterceptors();
-    bool addExtractor(const QRegExp &extractor);
-    QByteArray extract(const QRegExp &extractor);
+    void setExtractorMap(QMap<QString, QString> &extractMap);
+    QString extract(const QString &extractor);
 
 private:
     MemoryCookieJar* cookieJar;
     QNetworkDiskCache* diskCache;
-    QRegExp interceptor;
     QList<QString> interceptors;
-    QList<QRegExp> extractors;
-    QMap<QString, QByteArray> extractMap;
+    QMap<QString, QString> extractMap;
 
 private:
     QByteArray readOutgoingData(QIODevice* outgoingData);
     bool matchWillBeIntercept(const QUrl url);
-    bool matchWillBeExtract(const QUrl url);
+    QString matchWillBeExtract(const QUrl url);
 
 signals:
+    void dataExtracted(const QString &extractor, const QString &base64Data);
 
 public slots:
 

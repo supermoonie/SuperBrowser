@@ -22,6 +22,7 @@ public:
     ~WebPage();
 
 public:
+    NetworkAccessManager* getNetworkAccessManager();
     void setUserAgent(const QString &ua);
     QString getUserAgent();
     void setInterceptors(const QList<QString> &interceptors);

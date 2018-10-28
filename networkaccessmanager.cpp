@@ -19,34 +19,40 @@ QNetworkReply* NetworkAccessManager::createRequest(Operation op, const QNetworkR
         req.setUrl(QUrl("about:blank"));
         return QNetworkAccessManager::createRequest(op, req, outgoingData);
     }
-    QString path = request.url().path();
+    QString url = request.url().toString();
     if(op != GetOperation && outgoingData != NULL) {
         QByteArray data = readOutgoingData(outgoingData);
         if(request.url().hasQuery()) {
-            path.append("&");
+            url.append("&");
         } else {
-            path.append("?");
+            url.append("?");
         }
-        path.append(data);
+        url.append(QString(data));
     }
     QNetworkReply * reply = QNetworkAccessManager::createRequest(op, request, outgoingData);
-    if(matchWillBeIntercept(request.url())) {
+    QString extractor = matchWillBeExtract(QUrl(url));
+    if(!extractor.isNull()) {
         if(reply->bytesAvailable() > 0) {
-            extractMap.insert(path, reply->peek(reply->bytesAvailable()).toBase64());
+            QString base64Data = QString(reply->peek(reply->bytesAvailable()).toBase64());
+            extractMap.insert(extractor, base64Data);
+            emit dataExtracted(extractor, base64Data);
         } else {
             QByteArray * data = new QByteArray;
-            connect(reply, &QNetworkReply::readyRead, [reply, data, path](){
+            connect(reply, &QNetworkReply::readyRead, [reply, data, extractor](){
                 qint64 size = reply->bytesAvailable();
                 QByteArray array = reply->peek(size);
                 data->append(array);
             });
             connect(reply, &QNetworkReply::finished, [=](){
-                extractMap.insert(path, (*data).toBase64());
+                QString base64Data = QString((*data).toBase64());
+                extractMap.insert(extractor, base64Data);
                 delete data;
+                qDebug() << "url: " + url << "base64: " + base64Data;
+                emit NetworkAccessManager::dataExtracted(extractor, base64Data);
             });
         }
     }
-    return QNetworkAccessManager::createRequest(op, request, outgoingData);
+    return reply;
 }
 
 void NetworkAccessManager::setInterceptors(const QList<QString> &interceptors) {
@@ -62,44 +68,14 @@ QList<QString> NetworkAccessManager::getInterceptors() {
     return this->interceptors;
 }
 
-bool NetworkAccessManager::setInterceptor(const QRegExp &interceptor) {
-    if(interceptor.isEmpty() || !interceptor.isValid()) {
-        return false;
-    }
-    this->interceptor = interceptor;
-    return true;
-}
-
-bool NetworkAccessManager::addExtractor(const QRegExp &extractor) {
-    if(extractor.isEmpty() || !extractor.isValid()) {
-        return false;
-    }
-    if(this->extractors.contains(extractor)) {
-        return false;
-    }
-    this->extractors.append(extractor);
-    return true;
-}
-
-QByteArray NetworkAccessManager::extract(const QRegExp &extractor) {
-    if(extractor.isEmpty() || !extractor.isValid()) {
+QString NetworkAccessManager::extract(const QString &extractor) {
+    if(extractor.isEmpty()) {
         return NULL;
     }
-    QString key;
-    QList<QString> keys = this->extractMap.keys();
-    for(int i = 0; i < keys.size(); i ++) {
-        key = keys.at(i);
-        if(extractor.exactMatch(key)) {
-            break;
-        }
+    if(this->extractMap.contains(extractor) && !this->extractMap.value(extractor).isEmpty()) {
+        return this->extractMap.value(extractor);
     }
-    if(key.isEmpty()) {
-        return NULL;
-    }
-    const QString path = key;
-    QByteArray data = this->extractMap.value(path);
-    extractMap.remove(path);
-    return data;
+    return NULL;
 }
 
 QByteArray NetworkAccessManager::readOutgoingData(QIODevice *outgoingData) {
@@ -130,20 +106,27 @@ bool NetworkAccessManager::matchWillBeIntercept(const QUrl url) {
     return false;
 }
 
-bool NetworkAccessManager::matchWillBeExtract(const QUrl url) {
+QString NetworkAccessManager::matchWillBeExtract(const QUrl url) {
     if(url.isEmpty()) {
-        return false;
+        return NULL;
     }
     QString urlText = url.toString();
-    for(int i = 0; i < this->extractors.size(); i ++) {
-        QRegExp extractor = extractors.at(i);
-        if(extractor.isEmpty() || !extractor.isValid()) {
-            continue;
+    QString path = url.path();
+    for(QMap<QString, QString>::iterator it = this->extractMap.begin(); it != this->extractMap.end(); it ++) {
+        if(it.key().startsWith("http") && urlText == it.key()) {
+            return it.key();
         }
-        if(extractor.exactMatch(urlText)) {
-            return true;
-            break;
+        if(it.key().startsWith("/") && path == it.key()) {
+            return it.key();
+        }
+        QRegExp regExp(it.key());
+        if(regExp.isValid() && regExp.exactMatch(urlText)) {
+            return it.key();
         }
     }
-    return false;
+    return NULL;
+}
+
+void NetworkAccessManager::setExtractorMap(QMap<QString, QString> &extractMap) {
+    this->extractMap = extractMap;
 }

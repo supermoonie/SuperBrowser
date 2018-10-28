@@ -12,11 +12,6 @@ SuperBrowser::SuperBrowser(QObject* parent): QObject(parent)
     commandMap.insert("setCookies", &SuperBrowser::setCookies);
     commandMap.insert("deleteCookie", &SuperBrowser::deleteCookie);
     commandMap.insert("deleteCookies", &SuperBrowser::deleteCookies);
-    commandMap.insert("setProxy", &SuperBrowser::setProxy);
-    commandMap.insert("setUserAgent", &SuperBrowser::setUserAgent);
-    commandMap.insert("setInterceptor", &SuperBrowser::setInterceptor);
-    commandMap.insert("addExtractor", &SuperBrowser::addExtractor);
-    commandMap.insert("addExtractors", &SuperBrowser::addExtractors);
     commandMap.insert("getResponse", &SuperBrowser::getResponse);
     commandMap.insert("getResponses", &SuperBrowser::getResponses);
     QNetworkProxyFactory::setUseSystemConfiguration(true);
@@ -32,96 +27,35 @@ void SuperBrowser::close() {
 }
 
 void SuperBrowser::navigate(QJsonObject &in, QJsonObject* out) {
-    webPage->action(QWebPage::Stop);
-    // TODO 增加对自定义head的支持
-    QString url = in.value("parameters").toObject().value("url").toString("about:blank");
-    webPage->currentFrame()->load(QUrl::fromUserInput(url));
-    out->insert("code", 200);
+
 }
 
 void SuperBrowser::setProxy(QJsonObject &in, QJsonObject *out) {
-    QJsonObject proxyJson = in.value("parameters").toObject();
-    QNetworkProxy proxy;
-    QString type = proxyJson.value("type").toString();
-    if("NO_PROXY" == type) {
-        proxy.setType(QNetworkProxy::NoProxy);
-    } else {
-        if("SOCKS5_PROXY" == type) {
-            proxy.setType(QNetworkProxy::Socks5Proxy);
-        } else {
-            proxy.setType(QNetworkProxy::HttpProxy);
-        }
-        QString host = proxyJson.value("host").toString();
-        int port = proxyJson.value("port").toInt();
-        proxy.setHostName(host);
-        proxy.setPort(port);
-        QString user = in.value("user").toString();
-        if(!user.isNull() && !user.isEmpty()) {
-            proxy.setUser(user);
-        }
-        QString password = in.value("password").toString();
-        if(!password.isNull() && !password.isEmpty()) {
-            proxy.setPassword(password);
-        }
-    }
 
-    QNetworkProxy::setApplicationProxy(proxy);
-    out->insert("success", true);
 }
 
 void SuperBrowser::setUserAgent(QJsonObject &in, QJsonObject *out) {
-    QString ua = in.value("parameters").toString();
-    if(ua.isNull() || ua.isEmpty()) {
-        out->insert("success", false);
-        return;
-    }
-    this->webPage->setUserAgent(ua);
-    out->insert("success", true);
+
 }
 
 void SuperBrowser::setInterceptor(QJsonObject &in, QJsonObject *out) {
-    QString interceptor = in.value("parameters").toString();
-    if(interceptor.isNull() || interceptor.isEmpty()) {
-        out->insert("success", false);
-        return;
-    }
-    bool flag = this->networkAccessManager->setInterceptor(QRegExp(interceptor));
-    out->insert("success", flag);
+
 }
 
 bool SuperBrowser::addExtractor(const QString &extractor) {
-    if(extractor.isNull() || extractor.isEmpty()) {
-        return false;
-    }
-    return this->networkAccessManager->addExtractor(QRegExp(extractor));
+
 }
 
 void SuperBrowser::addExtractor(QJsonObject &in, QJsonObject *out) {
-    QString extractor = in.value("parameters").toString();
-    if(extractor.isNull() || extractor.isEmpty()) {
-        return;
-    }
-    bool flag = this->addExtractor(extractor);
-    out->insert(extractor, flag);
-}
 
-void SuperBrowser::addExtractors(QJsonObject &in, QJsonObject *out) {
-    QJsonArray extractors = in.value("parameters").toArray();
-    for(int i = 0; i < extractors.size(); i ++) {
-        QString extractor = extractors.at(i).toString();
-        if(extractor.isNull() || extractor.isEmpty()) {
-            continue;
-        }
-        bool flag = this->addExtractor(extractor);
-        out->insert(extractor, flag);
-    }
 }
 
 QByteArray SuperBrowser::getResponse(const QString &extractor) {
     if(extractor.isNull() || extractor.isEmpty()) {
         return NULL;
     }
-    return this->networkAccessManager->extract(QRegExp(extractor));
+//    return this->networkAccessManager->extract(QRegExp(extractor));
+    return QString("").toUtf8();
 }
 
 void SuperBrowser::getResponse(QJsonObject &in, QJsonObject *out) {

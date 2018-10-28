@@ -23,11 +23,16 @@ WebPage::WebPage(QObject* parent):
     commandMap.insert("setProxy", &WebPage::setProxy);
     commandMap.insert("setUserAgent", &WebPage::setUserAgent);
     commandMap.insert("setInterceptors", &WebPage::setInterceptors);
+    QNetworkProxyFactory::setUseSystemConfiguration(true);
 }
 
 WebPage::~WebPage()
 {
 
+}
+
+NetworkAccessManager* WebPage::getNetworkAccessManager() {
+    return this->networkAccessManager;
 }
 
 void WebPage::setUserAgent(const QString &ua) {
@@ -94,7 +99,7 @@ void WebPage::setInterceptors(QJsonObject &in, QJsonObject &out) {
         interceptors.append(interceptor);
     }
     if(interceptors.size() > 0) {
-        setInterceptors(interceptors);
+        networkAccessManager->setInterceptors(interceptors);
     }
 }
 
