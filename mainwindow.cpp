@@ -64,18 +64,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(interceptorAction, &QAction::triggered, this, &MainWindow::onInterceptorActionTriggered);
     // Settings
 
-    // Cookie
-    QMenu* cookieMenu = menuBar()->addMenu("Cookie");
-    QAction* getCookieAction = new QAction("GetCookie", this);
-    connect(getCookieAction, &QAction::triggered, this, &MainWindow::onGetCookieActionTriggered);
-    cookieMenu->addAction(getCookieAction);
-    // Cookie
-
     // Network
     QMenu* networkMenu = menuBar()->addMenu("Network");
     QAction* extractorEeditorAction = new QAction("Extractor", this);
     connect(extractorEeditorAction, &QAction::triggered, this, &MainWindow::onExtractorEeditorActionTriggered);
     networkMenu->addAction(extractorEeditorAction);
+
+    QAction* getCookieAction = new QAction("GetCookie", this);
+    connect(getCookieAction, &QAction::triggered, this, &MainWindow::onGetCookieActionTriggered);
+    networkMenu->addAction(getCookieAction);
     // Network
 
     setCentralWidget(view);
@@ -159,7 +156,11 @@ void MainWindow::onUserAgentActionTriggered() {
 }
 
 void MainWindow::changeLocation() {
-    QUrl url = QUrl::fromUserInput(locationEdit->text());
+    QString urlText = locationEdit->text();
+    if(!urlText.startsWith("http") && !urlText.startsWith("file://")) {
+        urlText = QString("http://") + urlText;
+    }
+    QUrl url = QUrl::fromUserInput(urlText);
     view->setUrl(url);
 }
 
