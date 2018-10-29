@@ -143,8 +143,8 @@ void ExtractorEditorDialog::on_delButton_clicked() {
     qDebug() << "---------------------------";
     qSort(rowWillDel);
     for(int i = rowWillDel.size() -1; i >= 0; i --) {
-        qDebug() << QString("rowWillDel: %1").arg(i);
-        model->takeRow(i);
+        qDebug() << QString("rowWillDel: %1").arg(rowWillDel.at(i));
+        model->takeRow(rowWillDel.at(i));
     }
     qDebug() << "---------------------------";
     QStringList extractors;
