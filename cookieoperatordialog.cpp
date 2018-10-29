@@ -34,7 +34,7 @@ void CookieOperatorDialog::updateModel(const QList<QNetworkCookie> &cookieList) 
     int count = model->rowCount();
     if(count > 0) {
         for(int row = count - 1; row >= 0; row --) {
-            model->takeRow(row);
+            model->removeRow(row);
         }
     }
     count = 0;
@@ -91,7 +91,7 @@ void CookieOperatorDialog::on_delButton_clicked() {
     QList<int> rows = rowWillDel.toList();
     qSort(rows);
     for(int i = rows.size() - 1; i >= 0; i --) {
-        model->takeRow(rows.at(i));
+        model->removeRow(rows.at(i));
     }
 }
 
@@ -103,7 +103,7 @@ void CookieOperatorDialog::on_clearButton_clicked() {
     QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "Delete All ?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if(button == QMessageBox::Yes) {
         for(int row = count - 1; row >= 0; row --) {
-            model->takeRow(row);
+            model->removeRow(row);
         }
     }
 }

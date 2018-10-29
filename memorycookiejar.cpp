@@ -1,4 +1,5 @@
 #include "memorycookiejar.h"
+#include <QDebug>
 
 MemoryCookieJar::MemoryCookieJar(QObject* parent): QNetworkCookieJar(parent)
 {
@@ -40,4 +41,16 @@ bool MemoryCookieJar::updateCookie(const QNetworkCookie &cookie) {
         emit cookieChanged();
     }
     return flag;
+}
+
+bool MemoryCookieJar::setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const QUrl &url) {
+    return QNetworkCookieJar::setCookiesFromUrl(cookieList, url);
+}
+
+QList<QNetworkCookie> MemoryCookieJar::cookiesForUrl(const QUrl &url) const {
+
+}
+
+bool MemoryCookieJar::validateCookie(const QNetworkCookie &cookie, const QUrl &url) const {
+
 }

@@ -20,6 +20,14 @@ public:
     virtual bool insertCookie(const QNetworkCookie &cookie) Q_DECL_OVERRIDE;
     virtual bool deleteCookie(const QNetworkCookie &cookie) Q_DECL_OVERRIDE;
     virtual bool updateCookie(const QNetworkCookie &cookie) Q_DECL_OVERRIDE;
+    virtual bool setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const QUrl &url) Q_DECL_OVERRIDE;
+    virtual QList<QNetworkCookie> cookiesForUrl(const QUrl &url) const Q_DECL_OVERRIDE;
+
+protected:
+    virtual bool validateCookie(const QNetworkCookie &cookie, const QUrl &url) const Q_DECL_OVERRIDE;
+
+private:
+    QMap<QString, QNetworkCookie> cookies;
 };
 
 #endif // MEMORYCOOKIEJAR_H
