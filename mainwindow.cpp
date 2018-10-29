@@ -14,7 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
     proxyDialog(NULL),
     interceptorDialog(NULL),
     serverDialog(NULL),
-    extractorEditorDialog(NULL)
+    extractorEditorDialog(NULL),
+    cookieOperatorDialog(NULL)
 {
     webSocketServer = new WebSocketServer(this);
     view = new QWebView(this);
@@ -70,7 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(extractorEeditorAction, &QAction::triggered, this, &MainWindow::onExtractorEeditorActionTriggered);
     networkMenu->addAction(extractorEeditorAction);
 
-    QAction* getCookieAction = new QAction("GetCookie", this);
+    QAction* getCookieAction = new QAction("Cookie", this);
     connect(getCookieAction, &QAction::triggered, this, &MainWindow::onGetCookieActionTriggered);
     networkMenu->addAction(getCookieAction);
     // Network
@@ -85,7 +86,10 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::onGetCookieActionTriggered() {
-    QMessageBox::information(this, "中文标题", "中文内容");
+    if(cookieOperatorDialog == NULL) {
+        cookieOperatorDialog = new CookieOperatorDialog(this);
+    }
+    cookieOperatorDialog->show();
 }
 
 // Extracotr

@@ -104,22 +104,49 @@ void ExtractorEditorDialog::on_addButton_clicked() {
     model->setItem(count, 1, secondItem);
 }
 
+bool compareModelIndex(const QModelIndex &index1, const QModelIndex &index2) {
+    if(index1.row() < index2.row()) {
+        return true;
+    } else if(index1.row() == index2.row()){
+        if(index1.column() < index2.column()) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
 void ExtractorEditorDialog::on_delButton_clicked() {
+    qDebug() << "---------------------------";
     QModelIndexList indexList = ui->tableView->selectionModel()->selectedIndexes();
     QList<int> rowWillDel;
     for(QModelIndex modelIndex: indexList) {
+        qDebug() << QString("row: %1, col: %2").arg(modelIndex.row()).arg(modelIndex.column());
         if(modelIndex.column() == 0) {
-            rowWillDel.append(modelIndex.column());
+            rowWillDel.append(modelIndex.row());
         }
     }
-    for(int i = indexList.size() - 1; i >= 0; i --) {
-        QModelIndex modelIndex = indexList.at(i);
-        if(modelIndex.column() == 1 && rowWillDel.indexOf(modelIndex.row()) == -1) {
-            model->setData(modelIndex, QVariant(""));
-        } else {
-            model->takeRow(modelIndex.row());
+    qDebug() << "---------------------------";
+    QModelIndexList itemWillBlank;
+    for(QModelIndex modelIndex: indexList) {
+        if(modelIndex.column() != 0 && rowWillDel.indexOf(modelIndex.row()) == -1) {
+            itemWillBlank.append(modelIndex);
         }
     }
+    qSort(itemWillBlank.begin(), itemWillBlank.end(), compareModelIndex);
+    for(QModelIndex modelIndex: itemWillBlank) {
+        qDebug() << QString("rowWillBlank: %1, col: %2").arg(modelIndex.row()).arg(modelIndex.column());
+        model->setData(modelIndex, QVariant(""));
+    }
+    qDebug() << "---------------------------";
+    qSort(rowWillDel);
+    for(int i = rowWillDel.size() -1; i >= 0; i --) {
+        qDebug() << QString("rowWillDel: %1").arg(i);
+        model->takeRow(i);
+    }
+    qDebug() << "---------------------------";
     QStringList extractors;
     int count = model->rowCount();
     for(int row = 0; row < count; row ++) {

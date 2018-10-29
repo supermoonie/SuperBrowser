@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Base64Data Decode</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="3">
@@ -72,9 +72,6 @@
        <string>DecodeToImage&gt;&gt;&gt;</string>
       </property>
      </widget>
-     <zorder>decodeToImgButton</zorder>
-     <zorder>decodeToStrButton</zorder>
-     <zorder>decodeToImgButton</zorder>
     </widget>
    </item>
    <item row="1" column="2">

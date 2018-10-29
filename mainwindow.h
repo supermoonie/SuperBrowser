@@ -11,6 +11,7 @@
 #include "interceptordialog.h"
 #include "serverdialog.h"
 #include "extractoreditordialog.h"
+#include "cookieoperatordialog.h"
 
 class MainWindow : public QMainWindow
 {
@@ -32,6 +33,7 @@ private:
     InterceptorDialog* interceptorDialog;
     ServerDialog* serverDialog;
     ExtractorEditorDialog* extractorEditorDialog;
+    CookieOperatorDialog* cookieOperatorDialog;
 
 private slots:
     void changeLocation();
