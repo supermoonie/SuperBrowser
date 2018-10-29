@@ -15,11 +15,41 @@ SetExtractorsDialog::SetExtractorsDialog(QWidget *parent) :
     ui->tableView->setModel(model);
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
     ui->tableView->verticalHeader()->setMinimumWidth(30);
+    ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    rightMenu = new QMenu(this);
+    viewAction = new QAction("View", this);
+    rightMenu->addAction(viewAction);
+    connect(ui->tableView, &QTableView::customContextMenuRequested,
+            this, &SetExtractorsDialog::onCustomContextMenuRequested);
+    connect(viewAction, &QAction::triggered, this, &SetExtractorsDialog::onViewActionTriggered);
 }
 
 SetExtractorsDialog::~SetExtractorsDialog()
 {
     delete ui;
+}
+
+void SetExtractorsDialog::onViewActionTriggered() {
+    if(base64DataViewDialog == NULL) {
+        base64DataViewDialog = new Base64DataViewDialog(this);
+    }
+    QModelIndexList indexList = ui->tableView->selectionModel()->selectedIndexes();
+    if(indexList.size() == 0) {
+        return;
+    }
+    QModelIndex modelIndex = indexList.at(0);
+    QStandardItem* item = model->itemFromIndex(modelIndex);
+    base64DataViewDialog->setBase64Data(item->text());
+    base64DataViewDialog->show();
+}
+
+void SetExtractorsDialog::onCustomContextMenuRequested(const QPoint &pos) {
+    QModelIndex modelIndex = ui->tableView->indexAt(pos);
+    QStandardItem* item = model->itemFromIndex(modelIndex);
+    if(item == NULL || item->column() != 1) {
+        return;
+    }
+    rightMenu->exec(QCursor::pos());
 }
 
 void SetExtractorsDialog::updateModel(const QString &extractor, const QString &base64Data) {
@@ -44,6 +74,7 @@ void SetExtractorsDialog::onItemChanged(QStandardItem * item) {
                 return;
             }
         }
+        QStringList extractors;
         int count = model->rowCount();
         for(int row = 0; row < count; row ++) {
             if(row == item->row()) {
@@ -58,7 +89,10 @@ void SetExtractorsDialog::onItemChanged(QStandardItem * item) {
                 item->setText("");
                 return;
             }
+            extractors.append(firstItem->text());
         }
+        extractors.append(item->text());
+        emit extractorChanged(extractors);
     }
 }
 
@@ -86,6 +120,16 @@ void SetExtractorsDialog::on_delButton_clicked() {
             model->takeRow(modelIndex.row());
         }
     }
+    QStringList extractors;
+    int count = model->rowCount();
+    for(int row = 0; row < count; row ++) {
+        QStandardItem * firstItem = model->item(row, 0);
+        if(firstItem->text().isEmpty()) {
+            continue;
+        }
+        extractors.append(firstItem->text());
+    }
+    emit extractorChanged(extractors);
 }
 
 void SetExtractorsDialog::on_clearButton_clicked() {
@@ -95,18 +139,11 @@ void SetExtractorsDialog::on_clearButton_clicked() {
         for(int row = count - 1; row >= 0; row --) {
             model->takeRow(row);
         }
+        QStringList extractors;
+        emit extractorChanged(extractors);
     }
 }
 
-void SetExtractorsDialog::on_saveButton_clicked() {
-    QMap<QString, QString> extractorItems;
-    int count = model->rowCount();
-    for(int row = 0; row < count; row ++) {
-        QStandardItem * firstItem = model->item(row, 0);
-        if(firstItem->text().isEmpty()) {
-            continue;
-        }
-        extractorItems.insert(firstItem->text(), "");
-    }
-    emit extractorChanged(extractorItems);
+void SetExtractorsDialog::on_okButton_clicked() {
+    this->close();
 }

@@ -47,7 +47,6 @@ QNetworkReply* NetworkAccessManager::createRequest(Operation op, const QNetworkR
                 QString base64Data = QString((*data).toBase64());
                 extractMap.insert(extractor, base64Data);
                 delete data;
-                qDebug() << "url: " + url << "base64: " + base64Data;
                 emit NetworkAccessManager::dataExtracted(extractor, base64Data);
             });
         }
@@ -72,7 +71,9 @@ QString NetworkAccessManager::extract(const QString &extractor) {
     if(extractor.isEmpty()) {
         return NULL;
     }
-    if(this->extractMap.contains(extractor) && !this->extractMap.value(extractor).isEmpty()) {
+    bool exist = this->extractMap.contains(extractor)
+            && !this->extractMap.value(extractor).isNull();
+    if(exist) {
         return this->extractMap.value(extractor);
     }
     return NULL;
@@ -112,21 +113,21 @@ QString NetworkAccessManager::matchWillBeExtract(const QUrl url) {
     }
     QString urlText = url.toString();
     QString path = url.path();
-    for(QMap<QString, QString>::iterator it = this->extractMap.begin(); it != this->extractMap.end(); it ++) {
-        if(it.key().startsWith("http") && urlText == it.key()) {
-            return it.key();
+    for(QString extractor : this->extractors) {
+        if(extractor.startsWith("http") && urlText == extractor) {
+            return extractor;
         }
-        if(it.key().startsWith("/") && path == it.key()) {
-            return it.key();
+        if(extractor.startsWith("/") && path == extractor) {
+            return extractor;
         }
-        QRegExp regExp(it.key());
+        QRegExp regExp(extractor);
         if(regExp.isValid() && regExp.exactMatch(urlText)) {
-            return it.key();
+            return extractor;
         }
     }
     return NULL;
 }
 
-void NetworkAccessManager::setExtractorMap(QMap<QString, QString> &extractMap) {
-    this->extractMap = extractMap;
+void NetworkAccessManager::setExtractors(QStringList &extractors) {
+    this->extractors = extractors;
 }

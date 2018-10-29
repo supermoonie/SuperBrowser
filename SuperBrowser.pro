@@ -23,7 +23,8 @@ SOURCES += main.cpp \
     interceptordialog.cpp \
     websocketserver.cpp \
     serverdialog.cpp \
-    setextractorsdialog.cpp
+    setextractorsdialog.cpp \
+    base64dataviewdialog.cpp
 
 HEADERS += \
     memorycookiejar.h \
@@ -35,10 +36,12 @@ HEADERS += \
     interceptordialog.h \
     websocketserver.h \
     serverdialog.h \
-    setextractorsdialog.h
+    setextractorsdialog.h \
+    base64dataviewdialog.h
 
 FORMS += \
     proxydialog.ui \
     interceptordialog.ui \
     serverdialog.ui \
-    setextractorsdialog.ui
+    setextractorsdialog.ui \
+    base64dataviewdialog.ui

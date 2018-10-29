@@ -20,13 +20,14 @@ public:
 public:
     void setInterceptors(const QList<QString> &interceptors);
     QList<QString> getInterceptors();
-    void setExtractorMap(QMap<QString, QString> &extractMap);
+    void setExtractors(QStringList &extractors);
     QString extract(const QString &extractor);
 
 private:
     MemoryCookieJar* cookieJar;
     QNetworkDiskCache* diskCache;
     QList<QString> interceptors;
+    QStringList extractors;
     QMap<QString, QString> extractMap;
 
 private:

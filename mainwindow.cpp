@@ -77,8 +77,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Network
     setExtractorsDialog = new SetExtractorsDialog(this);
-    connect(setExtractorsDialog, &SetExtractorsDialog::extractorChanged, [=](QMap<QString, QString> &extractorItems){
-        webPage->getNetworkAccessManager()->setExtractorMap(extractorItems);
+    connect(setExtractorsDialog, &SetExtractorsDialog::extractorChanged, [=](QStringList &extractors){
+        webPage->getNetworkAccessManager()->setExtractors(extractors);
     });
     connect(webPage->getNetworkAccessManager(), &NetworkAccessManager::dataExtracted, [=](const QString &extractor, const QString &base64Data){
         setExtractorsDialog->updateModel(extractor, base64Data);

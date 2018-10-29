@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Base64DataViewDialog</class>
+ <widget class="QDialog" name="Base64DataViewDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>700</width>
+    <height>448</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" colspan="3">
+    <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <pointsize>18</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Base64Data Decode</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QPlainTextEdit" name="base64TextEdit">
+     <property name="minimumSize">
+      <size>
+       <width>250</width>
+       <height>400</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QWidget" name="widget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>170</width>
+       <height>0</height>
+      </size>
+     </property>
+     <widget class="QPushButton" name="decodeToStrButton">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>100</y>
+        <width>135</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>DecodeToString&gt;&gt;&gt;</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="decodeToImgButton">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>190</y>
+        <width>135</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>DecodeToImage&gt;&gt;&gt;</string>
+      </property>
+     </widget>
+     <zorder>decodeToImgButton</zorder>
+     <zorder>decodeToStrButton</zorder>
+     <zorder>decodeToImgButton</zorder>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QTextEdit" name="decodedTextEdit">
+     <property name="minimumSize">
+      <size>
+       <width>250</width>
+       <height>400</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
