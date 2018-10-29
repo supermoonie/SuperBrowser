@@ -2,6 +2,7 @@
 super browser
 
 - 导航
+  - [x] navigate(url);
 - 配置
   - setProxy(proxy)
   - setUserAgent(ua)
