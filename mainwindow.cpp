@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(view, &QWebView::loadProgress, this, &MainWindow::onWebViewLoadProgress);
 
     locationEdit = new QLineEdit(this);
+    locationEdit->setCursor(Qt::IBeamCursor);
     locationEdit->setSizePolicy(QSizePolicy::Expanding, locationEdit->sizePolicy().verticalPolicy());
     connect(locationEdit, &QLineEdit::returnPressed, this, &MainWindow::changeLocation);
 
