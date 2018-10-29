@@ -1,14 +1,14 @@
-#include "setextractorsdialog.h"
-#include "ui_setextractorsdialog.h"
+#include "extractoreditordialog.h"
+#include "ui_extractoreditordialog.h"
 #include <QDebug>
 
-SetExtractorsDialog::SetExtractorsDialog(QWidget *parent) :
+ExtractorEditorDialog::ExtractorEditorDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::SetExtractorsDialog)
+    ui(new Ui::ExtractorEditorDialog)
 {
     ui->setupUi(this);
     model = new QStandardItemModel(this);
-    connect(model, &QStandardItemModel::itemChanged, this, &SetExtractorsDialog::onItemChanged);
+    connect(model, &QStandardItemModel::itemChanged, this, &ExtractorEditorDialog::onItemChanged);
     model->setColumnCount(2);
     model->setHeaderData(0, Qt::Horizontal, "Extractor");
     model->setHeaderData(1, Qt::Horizontal, "Base64Data");
@@ -20,16 +20,16 @@ SetExtractorsDialog::SetExtractorsDialog(QWidget *parent) :
     viewAction = new QAction("View", this);
     rightMenu->addAction(viewAction);
     connect(ui->tableView, &QTableView::customContextMenuRequested,
-            this, &SetExtractorsDialog::onCustomContextMenuRequested);
-    connect(viewAction, &QAction::triggered, this, &SetExtractorsDialog::onViewActionTriggered);
+            this, &ExtractorEditorDialog::onCustomContextMenuRequested);
+    connect(viewAction, &QAction::triggered, this, &ExtractorEditorDialog::onViewActionTriggered);
 }
 
-SetExtractorsDialog::~SetExtractorsDialog()
+ExtractorEditorDialog::~ExtractorEditorDialog()
 {
     delete ui;
 }
 
-void SetExtractorsDialog::onViewActionTriggered() {
+void ExtractorEditorDialog::onViewActionTriggered() {
     if(base64DataViewDialog == NULL) {
         base64DataViewDialog = new Base64DataViewDialog(this);
     }
@@ -43,7 +43,7 @@ void SetExtractorsDialog::onViewActionTriggered() {
     base64DataViewDialog->show();
 }
 
-void SetExtractorsDialog::onCustomContextMenuRequested(const QPoint &pos) {
+void ExtractorEditorDialog::onCustomContextMenuRequested(const QPoint &pos) {
     QModelIndex modelIndex = ui->tableView->indexAt(pos);
     QStandardItem* item = model->itemFromIndex(modelIndex);
     if(item == NULL || item->column() != 1) {
@@ -52,7 +52,7 @@ void SetExtractorsDialog::onCustomContextMenuRequested(const QPoint &pos) {
     rightMenu->exec(QCursor::pos());
 }
 
-void SetExtractorsDialog::updateModel(const QString &extractor, const QString &base64Data) {
+void ExtractorEditorDialog::updateModel(const QString &extractor, const QString &base64Data) {
     int count = model->rowCount();
     for(int row = 0; row < count; row ++) {
         QStandardItem * firstItem = model->item(row, 0);
@@ -64,7 +64,7 @@ void SetExtractorsDialog::updateModel(const QString &extractor, const QString &b
     }
 }
 
-void SetExtractorsDialog::onItemChanged(QStandardItem * item) {
+void ExtractorEditorDialog::onItemChanged(QStandardItem * item) {
     if(item->column() == 0 && !item->text().isEmpty()) {
         if(!item->text().startsWith("http") && !item->text().startsWith("/")) {
             QRegExp regExp(item->text());
@@ -96,7 +96,7 @@ void SetExtractorsDialog::onItemChanged(QStandardItem * item) {
     }
 }
 
-void SetExtractorsDialog::on_addButton_clicked() {
+void ExtractorEditorDialog::on_addButton_clicked() {
     int count = model->rowCount();
     QStandardItem* firstItem = new QStandardItem;
     model->setItem(count, 0, firstItem);
@@ -104,7 +104,7 @@ void SetExtractorsDialog::on_addButton_clicked() {
     model->setItem(count, 1, secondItem);
 }
 
-void SetExtractorsDialog::on_delButton_clicked() {
+void ExtractorEditorDialog::on_delButton_clicked() {
     QModelIndexList indexList = ui->tableView->selectionModel()->selectedIndexes();
     QList<int> rowWillDel;
     for(QModelIndex modelIndex: indexList) {
@@ -132,7 +132,7 @@ void SetExtractorsDialog::on_delButton_clicked() {
     emit extractorChanged(extractors);
 }
 
-void SetExtractorsDialog::on_clearButton_clicked() {
+void ExtractorEditorDialog::on_clearButton_clicked() {
     QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "Delete All ?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if(button == QMessageBox::Yes) {
         int count = model->rowCount();
@@ -144,6 +144,6 @@ void SetExtractorsDialog::on_clearButton_clicked() {
     }
 }
 
-void SetExtractorsDialog::on_okButton_clicked() {
+void ExtractorEditorDialog::on_okButton_clicked() {
     this->close();
 }

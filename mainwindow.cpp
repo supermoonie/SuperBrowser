@@ -10,7 +10,11 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    progress(0)
+    progress(0),
+    proxyDialog(NULL),
+    interceptorDialog(NULL),
+    serverDialog(NULL),
+    extractorEditorDialog(NULL)
 {
     webSocketServer = new WebSocketServer(this);
     view = new QWebView(this);
@@ -34,8 +38,6 @@ MainWindow::MainWindow(QWidget *parent) :
     toolBar->addWidget(locationEdit);
 
     // Server
-    serverDialog = new ServerDialog(this);
-    connect(serverDialog, &ServerDialog::accepted, this, &MainWindow::onServerDialogAccepted);
     QMenu* serverMenu = menuBar()->addMenu("Server");
     startAction = new QAction("Start", this);
     connect(startAction, &QAction::triggered, this, &MainWindow::onStartActionTriggered);
@@ -60,12 +62,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QAction* interceptorAction = new QAction("Interceptor", this);
     settingsMenu->addAction(interceptorAction);
     connect(interceptorAction, &QAction::triggered, this, &MainWindow::onInterceptorActionTriggered);
-
-    proxyDialog = new ProxyDialog(this);
-    connect(proxyDialog, &ProxyDialog::accepted, this, &MainWindow::onProxyDialogAccpted);
-
-    interceptorDialog = new InterceptorDialog(this);
-    connect(interceptorDialog, &InterceptorDialog::accepted, this, &MainWindow::onInterceptorDialogAccepted);
     // Settings
 
     // Cookie
@@ -76,19 +72,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // Cookie
 
     // Network
-    setExtractorsDialog = new SetExtractorsDialog(this);
-    connect(setExtractorsDialog, &SetExtractorsDialog::extractorChanged, [=](QStringList &extractors){
-        webPage->getNetworkAccessManager()->setExtractors(extractors);
-    });
-    connect(webPage->getNetworkAccessManager(), &NetworkAccessManager::dataExtracted, [=](const QString &extractor, const QString &base64Data){
-        setExtractorsDialog->updateModel(extractor, base64Data);
-    });
     QMenu* networkMenu = menuBar()->addMenu("Network");
-    QAction* setExtractorsAction = new QAction("SetExtractors", this);
-    connect(setExtractorsAction, &QAction::triggered, [=](){
-        setExtractorsDialog->show();
-    });
-    networkMenu->addAction(setExtractorsAction);
+    QAction* extractorEeditorAction = new QAction("Extractor", this);
+    connect(extractorEeditorAction, &QAction::triggered, this, &MainWindow::onExtractorEeditorActionTriggered);
+    networkMenu->addAction(extractorEeditorAction);
     // Network
 
     setCentralWidget(view);
@@ -104,6 +91,25 @@ void MainWindow::onGetCookieActionTriggered() {
     QMessageBox::information(this, "中文标题", "中文内容");
 }
 
+// Extracotr
+void MainWindow::onExtractorEeditorActionTriggered() {
+    if(extractorEditorDialog == NULL) {
+        extractorEditorDialog = new ExtractorEditorDialog(this);
+        connect(extractorEditorDialog, &ExtractorEditorDialog::extractorChanged, this, &MainWindow::onExtractorChanged);
+        connect(webPage->getNetworkAccessManager(), &NetworkAccessManager::dataExtracted, this, &MainWindow::onDataExtracted);
+    }
+    extractorEditorDialog->show();
+}
+
+void MainWindow::onExtractorChanged(QStringList &extractors) {
+    webPage->getNetworkAccessManager()->setExtractors(extractors);
+}
+
+void MainWindow::onDataExtracted(const QString &extractor, const QString &base64Data) {
+    extractorEditorDialog->updateModel(extractor, base64Data);
+}
+// Extractor
+
 void MainWindow::onInterceptorDialogAccepted() {
     QList<QString> interceptors = interceptorDialog->getInterceptors();
     if(interceptors.size() > 0) {
@@ -112,6 +118,10 @@ void MainWindow::onInterceptorDialogAccepted() {
 }
 
 void MainWindow::onInterceptorActionTriggered() {
+    if(interceptorDialog == NULL) {
+        interceptorDialog = new InterceptorDialog(this);
+        connect(interceptorDialog, &InterceptorDialog::accepted, this, &MainWindow::onInterceptorDialogAccepted);
+    }
     QList<QString> interceptros = webPage->getInterceptors();
     interceptorDialog->setInterceptors(interceptros);
     interceptorDialog->show();
@@ -159,6 +169,10 @@ void MainWindow::onProxyDialogAccpted() {
 }
 
 void MainWindow::onProxyActionTriggered() {
+    if(proxyDialog == NULL) {
+        proxyDialog = new ProxyDialog(this);
+        connect(proxyDialog, &ProxyDialog::accepted, this, &MainWindow::onProxyDialogAccpted);
+    }
     QNetworkProxy proxy = QNetworkProxy::applicationProxy();
     proxyDialog->setProxy(proxy);
     proxyDialog->show();
@@ -176,6 +190,10 @@ void MainWindow::onServerDialogAccepted() {
 }
 
 void MainWindow::onStartActionTriggered() {
+    if(serverDialog == NULL) {
+        serverDialog = new ServerDialog(this);
+        connect(serverDialog, &ServerDialog::accepted, this, &MainWindow::onServerDialogAccepted);
+    }
     serverDialog->show();
 }
 

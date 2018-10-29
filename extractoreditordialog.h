@@ -12,16 +12,16 @@
 #include "base64dataviewdialog.h"
 
 namespace Ui {
-class SetExtractorsDialog;
+class ExtractorEditorDialog;
 }
 
-class SetExtractorsDialog : public QDialog
+class ExtractorEditorDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit SetExtractorsDialog(QWidget *parent = 0);
-    ~SetExtractorsDialog();
+    explicit ExtractorEditorDialog(QWidget *parent = 0);
+    ~ExtractorEditorDialog();
     void updateModel(const QString &extractor, const QString &base64Data);
 
 signals:
@@ -37,7 +37,7 @@ private slots:
     void onViewActionTriggered();
 
 private:
-    Ui::SetExtractorsDialog *ui;
+    Ui::ExtractorEditorDialog *ui;
     QStandardItemModel* model;
     QMenu* rightMenu;
     QAction* viewAction;

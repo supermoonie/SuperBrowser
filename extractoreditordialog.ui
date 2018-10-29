@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SetExtractorsDialog</class>
- <widget class="QDialog" name="SetExtractorsDialog">
+ <class>ExtractorEditorDialog</class>
+ <widget class="QDialog" name="ExtractorEditorDialog">
   <property name="geometry">
    <rect>
     <x>0</x>

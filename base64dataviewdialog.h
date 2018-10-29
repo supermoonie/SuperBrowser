@@ -18,11 +18,11 @@ public:
 
 private slots:
     void on_decodeToStrButton_clicked();
-
     void on_decodeToImgButton_clicked();
 
 private:
     Ui::Base64DataViewDialog *ui;
+
 };
 
 #endif // BASE64DATAVIEWDIALOG_H

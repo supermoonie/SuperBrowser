@@ -10,7 +10,7 @@
 #include "proxydialog.h"
 #include "interceptordialog.h"
 #include "serverdialog.h"
-#include "setextractorsdialog.h"
+#include "extractoreditordialog.h"
 
 class MainWindow : public QMainWindow
 {
@@ -31,7 +31,7 @@ private:
     ProxyDialog* proxyDialog;
     InterceptorDialog* interceptorDialog;
     ServerDialog* serverDialog;
-    SetExtractorsDialog* setExtractorsDialog;
+    ExtractorEditorDialog* extractorEditorDialog;
 
 private slots:
     void changeLocation();
@@ -47,12 +47,22 @@ private slots:
     void onStopActionTriggered();
     // Server
 
+    // Settings
     void onProxyActionTriggered();
     void onProxyDialogAccpted();
     void onUserAgentActionTriggered();
     void onInterceptorActionTriggered();
+    // Settings
+
     // Cookie
     void onGetCookieActionTriggered();
+    // Cookie
+
+    // Extractor
+    void onExtractorEeditorActionTriggered();
+    void onExtractorChanged(QStringList &extractors);
+    void onDataExtracted(const QString &extractor, const QString &base64Data);
+    // Extractor
 
 signals:
 
