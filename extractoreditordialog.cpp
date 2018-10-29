@@ -119,16 +119,13 @@ bool compareModelIndex(const QModelIndex &index1, const QModelIndex &index2) {
 }
 
 void ExtractorEditorDialog::on_delButton_clicked() {
-    qDebug() << "---------------------------";
     QModelIndexList indexList = ui->tableView->selectionModel()->selectedIndexes();
     QList<int> rowWillDel;
     for(QModelIndex modelIndex: indexList) {
-        qDebug() << QString("row: %1, col: %2").arg(modelIndex.row()).arg(modelIndex.column());
         if(modelIndex.column() == 0) {
             rowWillDel.append(modelIndex.row());
         }
     }
-    qDebug() << "---------------------------";
     QModelIndexList itemWillBlank;
     for(QModelIndex modelIndex: indexList) {
         if(modelIndex.column() != 0 && rowWillDel.indexOf(modelIndex.row()) == -1) {
@@ -137,16 +134,12 @@ void ExtractorEditorDialog::on_delButton_clicked() {
     }
     qSort(itemWillBlank.begin(), itemWillBlank.end(), compareModelIndex);
     for(QModelIndex modelIndex: itemWillBlank) {
-        qDebug() << QString("rowWillBlank: %1, col: %2").arg(modelIndex.row()).arg(modelIndex.column());
         model->setData(modelIndex, QVariant(""));
     }
-    qDebug() << "---------------------------";
     qSort(rowWillDel);
     for(int i = rowWillDel.size() -1; i >= 0; i --) {
-        qDebug() << QString("rowWillDel: %1").arg(rowWillDel.at(i));
         model->takeRow(rowWillDel.at(i));
     }
-    qDebug() << "---------------------------";
     QStringList extractors;
     int count = model->rowCount();
     for(int row = 0; row < count; row ++) {
@@ -160,9 +153,12 @@ void ExtractorEditorDialog::on_delButton_clicked() {
 }
 
 void ExtractorEditorDialog::on_clearButton_clicked() {
+    int count = model->rowCount();
+    if(count == 0) {
+        return;
+    }
     QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "Delete All ?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if(button == QMessageBox::Yes) {
-        int count = model->rowCount();
         for(int row = count - 1; row >= 0; row --) {
             model->takeRow(row);
         }

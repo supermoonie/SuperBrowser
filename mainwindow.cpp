@@ -88,6 +88,7 @@ MainWindow::~MainWindow()
 void MainWindow::onGetCookieActionTriggered() {
     if(cookieOperatorDialog == NULL) {
         cookieOperatorDialog = new CookieOperatorDialog(this);
+        connect(webPage, &WebPage::cookieChanged, cookieOperatorDialog, &CookieOperatorDialog::updateModel);
     }
     cookieOperatorDialog->show();
 }

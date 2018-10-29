@@ -11,6 +11,7 @@ WebPage::WebPage(QObject* parent):
     userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36")
 {
     cookieJar = new MemoryCookieJar(this);
+    connect(cookieJar, &MemoryCookieJar::cookieChanged, this, &WebPage::onCookieChanged);
     networkAccessManager = new NetworkAccessManager(cookieJar, this);
     this->setNetworkAccessManager(networkAccessManager);
     QWebSettings * settings = QWebSettings::globalSettings();
@@ -29,6 +30,16 @@ WebPage::WebPage(QObject* parent):
 WebPage::~WebPage()
 {
 
+}
+
+void WebPage::onCookieChanged() {
+    QUrl baseUrl = this->currentFrame()->baseUrl();
+    QList<QNetworkCookie> cookieList = cookieJar->cookies(baseUrl.toString());
+    emit cookieChanged(cookieList);
+}
+
+MemoryCookieJar* WebPage::getCookieJar() {
+    return this->cookieJar;
 }
 
 NetworkAccessManager* WebPage::getNetworkAccessManager() {

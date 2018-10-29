@@ -23,6 +23,7 @@ public:
 
 public:
     NetworkAccessManager* getNetworkAccessManager();
+    MemoryCookieJar* getCookieJar();
     void setUserAgent(const QString &ua);
     QString getUserAgent();
     void setInterceptors(const QList<QString> &interceptors);
@@ -46,9 +47,11 @@ private:
 
 signals:
     void commandProcessed(QByteArray &data);
+    void cookieChanged(const QList<QNetworkCookie> &cookieList);
 
 public slots:
     void onCommandReceived(QWebSocket* client, const QString &command);
+    void onCookieChanged();
 
 };
 

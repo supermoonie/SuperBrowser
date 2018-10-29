@@ -17,3 +17,27 @@ QList<QNetworkCookie> MemoryCookieJar::cookies(const QString &url) const {
         return QNetworkCookieJar::cookiesForUrl(url);
     }
 }
+
+bool MemoryCookieJar::insertCookie(const QNetworkCookie &cookie) {
+    bool flag = QNetworkCookieJar::insertCookie(cookie);
+    if(flag) {
+        emit cookieChanged();
+    }
+    return flag;
+}
+
+bool MemoryCookieJar::deleteCookie(const QNetworkCookie &cookie) {
+    bool flag = QNetworkCookieJar::deleteCookie(cookie);
+    if(flag) {
+        emit cookieChanged();
+    }
+    return flag;
+}
+
+bool MemoryCookieJar::updateCookie(const QNetworkCookie &cookie) {
+    bool flag = QNetworkCookieJar::updateCookie(cookie);
+    if(flag) {
+        emit cookieChanged();
+    }
+    return flag;
+}

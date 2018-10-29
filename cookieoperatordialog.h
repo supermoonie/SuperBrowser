@@ -3,6 +3,9 @@
 
 #include <QDialog>
 #include <QStandardItemModel>
+#include <QMessageBox>
+#include <QNetworkCookie>
+#include <QDateTime>
 
 namespace Ui {
 class CookieOperatorDialog;
@@ -20,6 +23,13 @@ private slots:
     void on_addButton_clicked();
 
     void on_delButton_clicked();
+
+    void on_clearButton_clicked();
+
+    void on_okButton_clicked();
+
+public slots:
+    void updateModel(const QList<QNetworkCookie> &cookieList);
 
 private:
     Ui::CookieOperatorDialog *ui;
