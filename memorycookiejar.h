@@ -16,6 +16,7 @@ signals:
 
 public:
     QList<QNetworkCookie> cookies(const QUrl &url) const;
+    bool addCookie(const QNetworkCookie &cookie, const QUrl &url);
     virtual bool setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const QUrl &url) Q_DECL_OVERRIDE;
 
 };

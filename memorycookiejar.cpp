@@ -36,7 +36,7 @@ bool MemoryCookieJar::setCookiesFromUrl(const QList<QNetworkCookie> &cookieList,
         QUrl convertedUrl = !url.isEmpty() ?
                     url :
                     QUrl(QString((cookie.isSecure() ? "https://" : "http://")
-                                 + QString(cookie.domain().startsWith('.') ? "www" : "")
+                                 + (cookie.domain().startsWith('.') ? "www" : "")
                                  + cookie.domain()
                                  + (cookie.path().isEmpty() ? "/" : cookie.path())));
         qDebug() << convertedUrl.toString();
