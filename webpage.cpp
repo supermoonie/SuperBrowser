@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QNetworkProxy>
 #include <QDebug>
+#include <QStandardPaths>
 
 WebPage::WebPage(QObject* parent):
     QWebPage(parent),
@@ -15,11 +16,14 @@ WebPage::WebPage(QObject* parent):
     networkAccessManager = new NetworkAccessManager(cookieJar, this);
     this->setNetworkAccessManager(networkAccessManager);
     QWebSettings * settings = QWebSettings::globalSettings();
+    settings->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
     settings->setAttribute(QWebSettings::OfflineStorageDatabaseEnabled, true);
-    settings->setAttribute(QWebSettings::OfflineWebApplicationCacheEnabled, false);
+    settings->setAttribute(QWebSettings::OfflineWebApplicationCacheEnabled, true);
     settings->setAttribute(QWebSettings::LocalStorageEnabled, true);
     settings->setAttribute(QWebSettings::LocalContentCanAccessFileUrls, true);
     settings->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+    settings->setOfflineStorageDefaultQuota(20*1024*1024);
+    settings->setOfflineStoragePath(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
     commandMap.insert("navigate", &WebPage::navigate);
     commandMap.insert("setProxy", &WebPage::setProxy);
     commandMap.insert("setUserAgent", &WebPage::setUserAgent);
@@ -32,9 +36,19 @@ WebPage::~WebPage()
 
 }
 
+void WebPage::onCookieOperatorRefreshButtonClicked() {
+    QList<QNetworkCookie> cookieList = cookieJar->cookies(QUrl());
+    emit cookieChanged(cookieList);
+}
+
+void WebPage::onCookieOperatorEdited(const QList<QNetworkCookie> &cookieList) {
+    for(QNetworkCookie cookie: cookieList) {
+        cookieJar->insertCookie(cookie);
+    }
+}
+
 void WebPage::onCookieChanged() {
-    QUrl baseUrl = this->currentFrame()->baseUrl();
-    QList<QNetworkCookie> cookieList = cookieJar->cookies(baseUrl.toString());
+    QList<QNetworkCookie> cookieList = cookieJar->cookies(QUrl());
     emit cookieChanged(cookieList);
 }
 
@@ -56,6 +70,10 @@ QString WebPage::getUserAgent() {
 
 QString WebPage::userAgentForUrl(const QUrl &url) const {
     return userAgent;
+}
+
+QWebPage* WebPage::createWindow(WebWindowType type) {
+    return this;
 }
 
 void WebPage::navigate(QJsonObject &in, QJsonObject &out) {

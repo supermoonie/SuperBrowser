@@ -85,7 +85,7 @@ void SuperBrowser::getAllCookies(QJsonObject &in, QJsonObject* out) {
             cookies.append(cookieJar->cookies(url));
         }
     } else {
-        cookies = cookieJar->cookies(NULL);
+        cookies = cookieJar->cookies(QUrl());
     }
     QJsonArray cookieArray;
     for(int i = 0; i < cookies.size(); i ++) {

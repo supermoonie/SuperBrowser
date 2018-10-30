@@ -32,6 +32,7 @@ public:
 protected:
     QImage renderImage();
     QString userAgentForUrl(const QUrl &url) const;
+    virtual QWebPage* createWindow(WebWindowType type) Q_DECL_OVERRIDE;
 
 private:
     MemoryCookieJar* cookieJar;
@@ -52,6 +53,8 @@ signals:
 public slots:
     void onCommandReceived(QWebSocket* client, const QString &command);
     void onCookieChanged();
+    void onCookieOperatorEdited(const QList<QNetworkCookie> &cookieList);
+    void onCookieOperatorRefreshButtonClicked();
 
 };
 

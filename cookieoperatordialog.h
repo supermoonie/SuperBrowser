@@ -21,12 +21,16 @@ public:
 
 private slots:
     void on_addButton_clicked();
-
     void on_delButton_clicked();
-
     void on_clearButton_clicked();
-
     void on_okButton_clicked();
+    void onItemChanged(QStandardItem * item);
+
+    void on_refreshButton_clicked();
+
+signals:
+    void cookieOperatorEdited(const QList<QNetworkCookie> &cookieList);
+    void refreshButtonClicked();
 
 public slots:
     void updateModel(const QList<QNetworkCookie> &cookieList);

@@ -3,8 +3,10 @@
 #include <QCommandLineParser>
 #include <iostream>
 #include <QNetworkProxy>
+#include <QStandardPaths>
 //#include "superbrowser.h"
 #include "mainwindow.h"
+#include <QUrl>
 
 int main(int argc, char *argv[])
 {
@@ -18,6 +20,8 @@ int main(int argc, char *argv[])
     //    terminal->cout("path: ", false);
     //    terminal->cout(path, true);
     //    SuperBrowser browser(&app);
+    qDebug() << QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    qDebug() << QUrl("").isValid();
 #ifdef QT_NOT_DEBUG
     QCommandLineParser commandLineParser;
     commandLineParser.addHelpOption();

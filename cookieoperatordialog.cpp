@@ -8,6 +8,7 @@ CookieOperatorDialog::CookieOperatorDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     model = new QStandardItemModel(this);
+    connect(model, &QStandardItemModel::itemChanged, this, &CookieOperatorDialog::onItemChanged);
     model->setColumnCount(7);
     model->setHeaderData(0, Qt::Horizontal, "Name");
     model->setHeaderData(1, Qt::Horizontal, "Value");
@@ -19,7 +20,6 @@ CookieOperatorDialog::CookieOperatorDialog(QWidget *parent) :
     ui->tableView->setModel(model);
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
     ui->tableView->verticalHeader()->setMinimumWidth(30);
-    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -30,7 +30,48 @@ CookieOperatorDialog::~CookieOperatorDialog()
     delete ui;
 }
 
+void CookieOperatorDialog::onItemChanged(QStandardItem *item) {
+    QString text = item->text();
+    if(item->column() == 0 && text.isEmpty()) {
+        QMessageBox::warning(this, "Warning", "Name Is Empty!");
+        return;
+    }
+    if(item->column() == 2 && text.isEmpty()) {
+        QMessageBox::warning(this, "Warning", "Domain Is Empty!");
+        return;
+    }
+    QList<QNetworkCookie> cookieList;
+    int count = model->rowCount();
+    for(int row = 0; row < count; row ++) {
+        QString name = model->item(row, 0)->text();
+        QString value = model->item(row, 1)->text();
+        QString domain = model->item(row, 2)->text();
+        QString path = model->item(row, 3)->text();
+        if(path.isEmpty()) {
+            path = "/";
+        }
+        QString expirationDateText = model->item(row, 4)->text();
+        QDateTime dateTime = QDateTime::fromString(expirationDateText, "yyyy-MM-dd HH:mm:ss");
+        if(!dateTime.isValid()) {
+            QDateTime currentDateTime = QDateTime::currentDateTimeUtc();
+            currentDateTime.addDays(7);
+            dateTime = currentDateTime;
+        }
+        bool httpOnly = model->item(row, 4)->text() == "Yes" ? true : false;
+        bool secure = model->item(row, 5)->text() == "Yes" ? true : false;
+        QNetworkCookie cookie(name.toUtf8(), value.toUtf8());
+        cookie.setDomain(domain);
+        cookie.setPath(path);
+        cookie.setExpirationDate(dateTime);
+        cookie.setHttpOnly(httpOnly);
+        cookie.setSecure(secure);
+        cookieList.append(cookie);
+    }
+    emit cookieOperatorEdited(cookieList);
+}
+
 void CookieOperatorDialog::updateModel(const QList<QNetworkCookie> &cookieList) {
+    disconnect(model, &QStandardItemModel::itemChanged, this, &CookieOperatorDialog::onItemChanged);
     int count = model->rowCount();
     if(count > 0) {
         for(int row = count - 1; row >= 0; row --) {
@@ -62,6 +103,7 @@ void CookieOperatorDialog::updateModel(const QList<QNetworkCookie> &cookieList) 
         model->setItem(count, 6, secureItem);
         count ++;
     }
+    connect(model, &QStandardItemModel::itemChanged, this, &CookieOperatorDialog::onItemChanged);
 }
 
 void CookieOperatorDialog::on_addButton_clicked() {
@@ -110,4 +152,8 @@ void CookieOperatorDialog::on_clearButton_clicked() {
 
 void CookieOperatorDialog::on_okButton_clicked() {
     this->close();
+}
+
+void CookieOperatorDialog::on_refreshButton_clicked() {
+    emit refreshButtonClicked();
 }
