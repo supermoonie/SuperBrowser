@@ -45,6 +45,7 @@ void CookieOperatorDialog::onItemChanged(QStandardItem *item) {
     for(int row = 0; row < count; row ++) {
         QString name = model->item(row, 0)->text();
         QString value = model->item(row, 1)->text();
+        QNetworkCookie cookie(name.toUtf8(), value.toUtf8());
         QString domain = model->item(row, 2)->text();
         QString path = model->item(row, 3)->text();
         if(path.isEmpty()) {
@@ -52,17 +53,16 @@ void CookieOperatorDialog::onItemChanged(QStandardItem *item) {
         }
         QString expirationDateText = model->item(row, 4)->text();
         QDateTime dateTime = QDateTime::fromString(expirationDateText, "yyyy-MM-dd HH:mm:ss");
-        if(!dateTime.isValid()) {
-            QDateTime currentDateTime = QDateTime::currentDateTimeUtc();
+        if(dateTime.isValid() && dateTime > QDateTime::currentDateTime()) {
+            QDateTime currentDateTime = QDateTime::currentDateTime();
             currentDateTime.addDays(7);
-            dateTime = currentDateTime;
+            cookie.setExpirationDate(currentDateTime);
         }
-        bool httpOnly = model->item(row, 4)->text() == "Yes" ? true : false;
-        bool secure = model->item(row, 5)->text() == "Yes" ? true : false;
-        QNetworkCookie cookie(name.toUtf8(), value.toUtf8());
+        bool httpOnly = model->item(row, 5)->text() == "Yes" ? true : false;
+        bool secure = model->item(row, 6)->text() == "Yes" ? true : false;
         cookie.setDomain(domain);
         cookie.setPath(path);
-        cookie.setExpirationDate(dateTime);
+
         cookie.setHttpOnly(httpOnly);
         cookie.setSecure(secure);
         cookieList.append(cookie);
@@ -93,7 +93,11 @@ void CookieOperatorDialog::updateModel(const QList<QNetworkCookie> &cookieList) 
         pathItem->setText(cookie.path());
         model->setItem(count, 3, pathItem);
         QStandardItem* expiresItem = new QStandardItem;
-        expiresItem->setText(cookie.expirationDate().toString("yyyy-MM-dd HH:mm:ss"));
+        if(cookie.expirationDate().isValid()) {
+            expiresItem->setText(cookie.expirationDate().toString("yyyy-MM-dd HH:mm:ss"));
+        } else {
+            expiresItem->setText(QDateTime::fromMSecsSinceEpoch(-1).toUTC().toString("yyyy-MM-dd HH:mm:ss"));
+        }
         model->setItem(count, 4, expiresItem);
         QStandardItem* httpOnlyItem = new QStandardItem;
         httpOnlyItem->setText(cookie.isHttpOnly() ? "Yes" : "No");

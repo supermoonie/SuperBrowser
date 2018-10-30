@@ -21,7 +21,32 @@ QList<QNetworkCookie> MemoryCookieJar::cookies(const QUrl &url) const {
 }
 
 bool MemoryCookieJar::setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const QUrl &url) {
-    bool flag = QNetworkCookieJar::setCookiesFromUrl(cookieList, url);
+    bool isSecure = url.scheme().startsWith("https") ? true : false;
+    bool flag = false;
+    qDebug() << "---------------------------------";
+    for(QNetworkCookie cookie: cookieList) {
+        cookie.setSecure(isSecure);
+        if(cookie.domain().isEmpty()) {
+            cookie.setDomain(url.host());
+        }
+        if(cookie.path().isEmpty()) {
+            cookie.setPath("/");
+        }
+        qDebug() << cookie.toRawForm();
+        QUrl convertedUrl = !url.isEmpty() ?
+                    url :
+                    QUrl(QString((cookie.isSecure() ? "https://" : "http://")
+                                 + QString(cookie.domain().startsWith('.') ? "www" : "")
+                                 + cookie.domain()
+                                 + (cookie.path().isEmpty() ? "/" : cookie.path())));
+        qDebug() << convertedUrl.toString();
+        if(!flag) {
+            flag = QNetworkCookieJar::setCookiesFromUrl(QList<QNetworkCookie>() << cookie, convertedUrl);
+        } else {
+            QNetworkCookieJar::setCookiesFromUrl(QList<QNetworkCookie>() << cookie, convertedUrl);
+        }
+        qDebug() << flag;
+    }
     if(flag) {
         emit cookieChanged();
     }

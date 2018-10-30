@@ -42,9 +42,7 @@ void WebPage::onCookieOperatorRefreshButtonClicked() {
 }
 
 void WebPage::onCookieOperatorEdited(const QList<QNetworkCookie> &cookieList) {
-    for(QNetworkCookie cookie: cookieList) {
-        cookieJar->insertCookie(cookie);
-    }
+    cookieJar->setCookiesFromUrl(cookieList, QUrl());
 }
 
 void WebPage::onCookieChanged() {
