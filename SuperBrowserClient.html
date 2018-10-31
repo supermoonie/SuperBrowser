@@ -3,22 +3,47 @@
     <head>
         <title>WebSocket Client</title>
         <meta charset="utf-8">
+        <style type="text/css">
+        	.main{
+                background-color: #fff;
+                width: 980px;
+                height: 550px;
+                margin: 10px auto;
+            }
+        </style>
     </head>
-    <body>
+    <body class="main">
         <h1>WebSocket Client</h1>
-        <p>
-            <button onClick="initWebSocket();">Connect</button>
-            <button onClick="stopWebSocket();">Disconnect</button>
-            <button onClick="checkSocket();">State</button>
-        </p>
-        <p>
-            <textarea id="debugTextArea" style="width:400px;height:200px;font-size: 14px;"></textarea>
-        </p>
-        <p>
-            <textarea id="inputText" style="width:400px;height:200px;font-size: 14px;"></textarea>
-            <br>
-            <button onClick="sendMessage();">Send</button>
-        </p>
+        <div id="main" style="width: 980px; min-height: 550px;">
+        	<div id="left" style="width: 469px; min-height: 550px; padding-left: 10px; padding-right: 10px; border-right: 1px dashed #ccc; float: left;">
+        		<p style="width: 469px;">
+		            <button onClick="initWebSocket();">Connect</button>
+		            <button onClick="stopWebSocket();">Disconnect</button>
+		            <button onClick="checkSocket();">State</button>
+		        </p>
+		        <p style="width: 469px;">
+		            <textarea id="debugTextArea" style="width: 467px; height:200px; font-size: 14px; resize: none; padding: 0px;"></textarea>
+		        </p>
+		        <p style="width: 469px;">
+		            <textarea id="inputText" style="width: 467px; height:200px; font-size: 14px; resize: none; padding: 0px;"></textarea>
+		        </p style="width: 469px;">
+		        <p style="width: 469px; text-align: right;">
+		        	<button onClick="sendMessage();">Send</button>
+		        </p>
+        	</div>
+        	<div id="right" style="width: 480px; min-height: 550px; float: right; padding-left: 10px;">
+        		<pre>
+{
+  "name": "navigate",
+  "parameters": {
+    "url": "https://ip.cn"
+  }
+}
+        		</pre>
+        	</div>
+        	
+        </div>
+        
 
         <script type="text/javascript">
             var debugTextArea = document.getElementById("debugTextArea");
