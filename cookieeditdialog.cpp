@@ -19,7 +19,7 @@ void CookieEditDialog::reset() {
     ui->valueLineEdit->clear();
     ui->domainLineEdit->clear();
     ui->pathLineEdit->clear();
-    ui->expiresDateTimeEdit->setDateTime(QDateTime::currentDateTimeUtc());
+    ui->expiresDateTimeEdit->setDateTime(QDateTime::currentDateTime());
     ui->httpOnlyCheckBox->setCheckState(Qt::Unchecked);
     ui->secureCheckBox->setCheckState(Qt::Unchecked);
 }

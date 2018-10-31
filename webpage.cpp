@@ -42,12 +42,11 @@ void WebPage::onCookieOperatorRefreshButtonClicked() {
 }
 
 void WebPage::onCookieEdited(const QNetworkCookie &cookie) {
-    bool isInserted = cookieJar->addCookie(cookie, QUrl());
-    qDebug() << cookie.toRawForm();
-    qDebug() << isInserted;
-    QList<QNetworkCookie> cookieList = cookieJar->cookies(QUrl());
-    qDebug() << cookieList.size();
-    emit cookieChanged(cookieList);
+    bool inserted = cookieJar->addCookie(cookie, QUrl());
+    if(inserted) {
+        QList<QNetworkCookie> cookieList = cookieJar->cookies(QUrl());
+        emit cookieChanged(cookieList);
+    }
 }
 
 void WebPage::onCookieChanged() {
@@ -77,6 +76,14 @@ QString WebPage::userAgentForUrl(const QUrl &url) const {
 
 QWebPage* WebPage::createWindow(WebWindowType type) {
     return this;
+}
+
+QList<QString> WebPage::getInterceptors() {
+    return networkAccessManager->getInterceptors();
+}
+
+void WebPage::setInterceptors(const QList<QString> &interceptors) {
+    networkAccessManager->setInterceptors(interceptors);
 }
 
 void WebPage::navigate(QJsonObject &in, QJsonObject &out) {
@@ -133,14 +140,6 @@ void WebPage::setInterceptors(QJsonObject &in, QJsonObject &out) {
     if(interceptors.size() > 0) {
         networkAccessManager->setInterceptors(interceptors);
     }
-}
-
-QList<QString> WebPage::getInterceptors() {
-    return networkAccessManager->getInterceptors();
-}
-
-void WebPage::setInterceptors(const QList<QString> &interceptors) {
-    networkAccessManager->setInterceptors(interceptors);
 }
 
 QImage WebPage::renderImage() {
