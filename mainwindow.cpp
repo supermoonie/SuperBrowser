@@ -90,8 +90,11 @@ void MainWindow::onGetCookieActionTriggered() {
     if(cookieOperatorDialog == NULL) {
         cookieOperatorDialog = new CookieOperatorDialog(this);
         connect(webPage, &WebPage::cookieChanged, cookieOperatorDialog, &CookieOperatorDialog::updateModel);
-        connect(cookieOperatorDialog, &CookieOperatorDialog::cookieOperatorEdited, webPage, &WebPage::onCookieOperatorEdited);
+        connect(cookieOperatorDialog, &CookieOperatorDialog::cookieEdited, webPage, &WebPage::onCookieEdited);
         connect(cookieOperatorDialog, &CookieOperatorDialog::refreshButtonClicked, webPage, &WebPage::onCookieOperatorRefreshButtonClicked);
+        connect(cookieOperatorDialog, &CookieOperatorDialog::clearCookie, webPage->getCookieJar(), &MemoryCookieJar::clearCookies);
+        connect(cookieOperatorDialog, &CookieOperatorDialog::delCookie, webPage->getCookieJar(), &MemoryCookieJar::deleteCookie);
+        emit webPage->getCookieJar()->cookieChanged();
     }
     cookieOperatorDialog->show();
 }

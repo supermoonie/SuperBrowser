@@ -58,6 +58,9 @@
       <property name="text">
        <string>DecodeToString&gt;&gt;&gt;</string>
       </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
      </widget>
      <widget class="QPushButton" name="decodeToImgButton">
       <property name="geometry">
@@ -70,6 +73,9 @@
       </property>
       <property name="text">
        <string>DecodeToImage&gt;&gt;&gt;</string>
+      </property>
+      <property name="autoDefault">
+       <bool>false</bool>
       </property>
      </widget>
     </widget>

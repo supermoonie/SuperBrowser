@@ -22,6 +22,7 @@ ExtractorEditorDialog::ExtractorEditorDialog(QWidget *parent) :
     connect(ui->tableView, &QTableView::customContextMenuRequested,
             this, &ExtractorEditorDialog::onCustomContextMenuRequested);
     connect(viewAction, &QAction::triggered, this, &ExtractorEditorDialog::onViewActionTriggered);
+    base64DataViewDialog = new Base64DataViewDialog(this);
 }
 
 ExtractorEditorDialog::~ExtractorEditorDialog()
@@ -30,9 +31,6 @@ ExtractorEditorDialog::~ExtractorEditorDialog()
 }
 
 void ExtractorEditorDialog::onViewActionTriggered() {
-    if(base64DataViewDialog == NULL) {
-        base64DataViewDialog = new Base64DataViewDialog(this);
-    }
     QModelIndexList indexList = ui->tableView->selectionModel()->selectedIndexes();
     if(indexList.size() == 0) {
         return;

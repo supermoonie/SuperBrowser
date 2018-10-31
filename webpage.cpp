@@ -41,8 +41,13 @@ void WebPage::onCookieOperatorRefreshButtonClicked() {
     emit cookieChanged(cookieList);
 }
 
-void WebPage::onCookieOperatorEdited(const QList<QNetworkCookie> &cookieList) {
-    cookieJar->setCookiesFromUrl(cookieList, QUrl());
+void WebPage::onCookieEdited(const QNetworkCookie &cookie) {
+    bool isInserted = cookieJar->addCookie(cookie, QUrl());
+    qDebug() << cookie.toRawForm();
+    qDebug() << isInserted;
+    QList<QNetworkCookie> cookieList = cookieJar->cookies(QUrl());
+    qDebug() << cookieList.size();
+    emit cookieChanged(cookieList);
 }
 
 void WebPage::onCookieChanged() {

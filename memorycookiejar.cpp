@@ -20,35 +20,43 @@ QList<QNetworkCookie> MemoryCookieJar::cookies(const QUrl &url) const {
     }
 }
 
-bool MemoryCookieJar::setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const QUrl &url) {
-    bool isSecure = url.scheme().startsWith("https") ? true : false;
-    bool flag = false;
-    qDebug() << "---------------------------------";
-    for(QNetworkCookie cookie: cookieList) {
-        cookie.setSecure(isSecure);
-        if(cookie.domain().isEmpty()) {
-            cookie.setDomain(url.host());
+bool MemoryCookieJar::deleteCookie(const QNetworkCookie &cookie) {
+    bool deleted = false;
+    QList<QNetworkCookie> cookis = allCookies();
+    for(int i = 0; i < cookis.size(); i ++) {
+        QNetworkCookie networkCookie = cookis.at(i);
+        if(networkCookie.name() == cookie.name() &&
+                networkCookie.domain() == cookie.domain() &&
+                networkCookie.path() == cookie.path()) {
+            cookis.removeAt(i);
+            deleted = true;
         }
-        if(cookie.path().isEmpty()) {
-            cookie.setPath("/");
-        }
-        qDebug() << cookie.toRawForm();
-        QUrl convertedUrl = !url.isEmpty() ?
-                    url :
-                    QUrl(QString((cookie.isSecure() ? "https://" : "http://")
-                                 + (cookie.domain().startsWith('.') ? "www" : "")
-                                 + cookie.domain()
-                                 + (cookie.path().isEmpty() ? "/" : cookie.path())));
-        qDebug() << convertedUrl.toString();
-        if(!flag) {
-            flag = QNetworkCookieJar::setCookiesFromUrl(QList<QNetworkCookie>() << cookie, convertedUrl);
-        } else {
-            QNetworkCookieJar::setCookiesFromUrl(QList<QNetworkCookie>() << cookie, convertedUrl);
-        }
-        qDebug() << flag;
     }
+    if(deleted) {
+        setAllCookies(cookis);
+        emit cookieChanged();
+    }
+}
+
+bool MemoryCookieJar::addCookie(const QNetworkCookie &cookie, const QUrl &url) {
+    QUrl convertedUrl = !url.isEmpty() ?
+                url :
+                QUrl(QString((cookie.isSecure() ? "https://" : "http://")
+                             + QString((cookie.domain().startsWith('.') ? "www" : ""))
+                             + cookie.domain()
+                             + (cookie.path().isEmpty() ? "/" : cookie.path())));
+    return setCookiesFromUrl(QList<QNetworkCookie>() << cookie, convertedUrl);
+}
+
+bool MemoryCookieJar::setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const QUrl &url) {
+    bool flag = QNetworkCookieJar::setCookiesFromUrl(cookieList, url);
     if(flag) {
         emit cookieChanged();
     }
     return flag;
+}
+
+void MemoryCookieJar::clearCookies() {
+    setAllCookies(QList<QNetworkCookie>());
+    emit cookieChanged();
 }

@@ -53,7 +53,7 @@ signals:
 public slots:
     void onCommandReceived(QWebSocket* client, const QString &command);
     void onCookieChanged();
-    void onCookieOperatorEdited(const QList<QNetworkCookie> &cookieList);
+    void onCookieEdited(const QNetworkCookie &cookie);
     void onCookieOperatorRefreshButtonClicked();
 
 };

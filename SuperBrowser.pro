@@ -25,7 +25,8 @@ SOURCES += main.cpp \
     serverdialog.cpp \
     base64dataviewdialog.cpp \
     extractoreditordialog.cpp \
-    cookieoperatordialog.cpp
+    cookieoperatordialog.cpp \
+    cookieeditdialog.cpp
 
 HEADERS += \
     memorycookiejar.h \
@@ -39,7 +40,8 @@ HEADERS += \
     serverdialog.h \
     base64dataviewdialog.h \
     extractoreditordialog.h \
-    cookieoperatordialog.h
+    cookieoperatordialog.h \
+    cookieeditdialog.h
 
 FORMS += \
     proxydialog.ui \
@@ -47,4 +49,5 @@ FORMS += \
     serverdialog.ui \
     base64dataviewdialog.ui \
     extractoreditordialog.ui \
-    cookieoperatordialog.ui
+    cookieoperatordialog.ui \
+    cookieeditdialog.ui

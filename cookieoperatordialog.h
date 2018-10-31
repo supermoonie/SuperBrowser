@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QNetworkCookie>
 #include <QDateTime>
+#include "cookieeditdialog.h"
 
 namespace Ui {
 class CookieOperatorDialog;
@@ -24,20 +25,23 @@ private slots:
     void on_delButton_clicked();
     void on_clearButton_clicked();
     void on_okButton_clicked();
-    void onItemChanged(QStandardItem * item);
-
-    void on_refreshButton_clicked();
+    void on_editButton_clicked();
 
 signals:
-    void cookieOperatorEdited(const QList<QNetworkCookie> &cookieList);
+    void cookieEdited(const QNetworkCookie &cookie);
     void refreshButtonClicked();
+    void clearCookie();
+    void delCookie(const QNetworkCookie &cookie);
 
 public slots:
     void updateModel(const QList<QNetworkCookie> &cookieList);
+    void onCookieEdited(const QNetworkCookie &cookie);
 
 private:
     Ui::CookieOperatorDialog *ui;
     QStandardItemModel* model;
+    CookieEditDialog* cookieEditDialog;
+    QList<QNetworkCookie> cookies;
 };
 
 #endif // COOKIEOPERATORDIALOG_H

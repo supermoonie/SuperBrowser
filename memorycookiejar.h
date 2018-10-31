@@ -19,6 +19,10 @@ public:
     bool addCookie(const QNetworkCookie &cookie, const QUrl &url);
     virtual bool setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const QUrl &url) Q_DECL_OVERRIDE;
 
+public slots:
+    void clearCookies();
+    bool deleteCookie(const QNetworkCookie &cookie);
+
 };
 
 #endif // MEMORYCOOKIEJAR_H
