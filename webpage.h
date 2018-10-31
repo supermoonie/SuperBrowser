@@ -47,6 +47,7 @@ private:
     void setUserAgent(QJsonObject &in, QJsonObject &out);
     void setInterceptors(QJsonObject &in, QJsonObject &out);
     void getWindowBounds(QJsonObject &in, QJsonObject &out);
+    void setWindowBounds(QJsonObject &in, QJsonObject &out);
 
 signals:
     void commandProcessed(QByteArray &data);

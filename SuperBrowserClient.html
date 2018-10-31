@@ -10,6 +10,9 @@
                 height: 550px;
                 margin: 10px auto;
             }
+            #right pre{
+                padding-left: 20px;
+            }
         </style>
     </head>
     <body class="main">
@@ -32,20 +35,34 @@
 		        </p>
         	</div>
         	<div id="right" style="width: 480px; min-height: 550px; float: right; padding-left: 10px;">
+                <p><strong>Browser :</strong></p>
         		<pre>
 {
-  "name": "navigate",
-  "parameters": {
-    "url": "https://ip.cn"
-  }
+    "name": "navigate",
+    "parameters": {
+        "url": "https://ip.cn"
+    }
 }
-
 {
-  "name": "getWindowBounds",
-  "parameters": {}
+    "name": "getWindowBounds",
+    "parameters": {}
+}
+{
+    "name": "setWindowBounds",
+    "parameters": {
+        "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 800,
+            "height": 600
+        }
+    }
 }
 
         		</pre>
+                <pre>
+
+                </pre>
         	</div>
         	
         </div>

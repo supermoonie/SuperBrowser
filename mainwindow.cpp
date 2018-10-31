@@ -82,6 +82,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setCentralWidget(view);
     setUnifiedTitleAndToolBarOnMac(true);
+
 }
 
 MainWindow::~MainWindow()

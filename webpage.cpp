@@ -33,6 +33,7 @@ WebPage::WebPage(QObject* parent):
     commandMap.insert("setUserAgent", &WebPage::setUserAgent);
     commandMap.insert("setInterceptors", &WebPage::setInterceptors);
     commandMap.insert("getWindowBounds", &WebPage::getWindowBounds);
+    commandMap.insert("setWindowBounds", &WebPage::setWindowBounds);
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 }
 
@@ -151,6 +152,18 @@ void WebPage::getWindowBounds(QJsonObject &in, QJsonObject &out) {
     out.insert("y", MainWindow::instance()->y());
     out.insert("width", MainWindow::instance()->width());
     out.insert("height", MainWindow::instance()->height());
+}
+
+void WebPage::setWindowBounds(QJsonObject &in, QJsonObject &out) {
+    QJsonObject boundsJson = in.value("parameters").toObject();
+    if(boundsJson.contains("bounds")) {
+        boundsJson = boundsJson.value("bounds").toObject();
+    }
+    int x = boundsJson.value("x").toInt();
+    int y = boundsJson.value("y").toInt();
+    int width = boundsJson.value("width").toInt(800);
+    int height = boundsJson.value("height").toInt(600);
+    MainWindow::instance()->setGeometry(x, y, width, height);
 }
 
 QImage WebPage::renderImage() {

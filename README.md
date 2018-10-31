@@ -40,8 +40,9 @@ super browser
 - [ ] Release
   - [ ] Browser
     - [x] navigate
-    - [ ] getWindowBounds
-    - [ ] setWindowBounds
+    - [x] getWindowBounds
+    - [x] setWindowBounds
+    - [ ] setWindowStates
     - [ ] close
   - [ ] Dom: loadStart List<QWebElement>
     - [ ] Id
@@ -70,8 +71,6 @@ super browser
     - [ ] StopLoading
   - [ ] Runtime
     - [ ] Evaluate
-
-  > {}
 
 ```json
 {"name":"navigate","parameters":{"url":"https://ip.cn"}}
