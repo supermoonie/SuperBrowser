@@ -71,6 +71,8 @@ super browser
   - [ ] Runtime
     - [ ] Evaluate
 
+  > {}
+
 ```json
 {"name":"navigate","parameters":{"url":"https://ip.cn"}}
 
