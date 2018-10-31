@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(locationEdit, &QLineEdit::returnPressed, this, &MainWindow::changeLocation);
 
     QToolBar *toolBar = addToolBar(tr("Navigation"));
+    toolBar->setMovable(false);
     toolBar->addAction(view->pageAction(QWebPage::Back));
     toolBar->addAction(view->pageAction(QWebPage::Forward));
     toolBar->addAction(view->pageAction(QWebPage::Reload));
