@@ -60,8 +60,8 @@ super browser
     - [ ] GetResponseBody
     - [ ] GetRequestPostData
     - [ ] SetBlockedURLs
-    - [ ] SetUserAgentOverride
-    - [ ] SetProxy
+    - [x] SetUserAgentOverride
+    - [x] SetProxy
   - [ ] Page
     - [ ] CaptureScreenshot
     - [ ] PrintToPDF

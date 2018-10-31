@@ -6,11 +6,15 @@
 #include <QNetworkProxy>
 #include <QDebug>
 #include <QStandardPaths>
+#include "mainwindow.h"
+
+static WebPage* INSTANCE = NULL;
 
 WebPage::WebPage(QObject* parent):
     QWebPage(parent),
     userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36")
 {
+    INSTANCE = this;
     cookieJar = new MemoryCookieJar(this);
     connect(cookieJar, &MemoryCookieJar::cookieChanged, this, &WebPage::onCookieChanged);
     networkAccessManager = new NetworkAccessManager(cookieJar, this);
@@ -28,12 +32,17 @@ WebPage::WebPage(QObject* parent):
     commandMap.insert("setProxy", &WebPage::setProxy);
     commandMap.insert("setUserAgent", &WebPage::setUserAgent);
     commandMap.insert("setInterceptors", &WebPage::setInterceptors);
+    commandMap.insert("getWindowBounds", &WebPage::getWindowBounds);
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 }
 
 WebPage::~WebPage()
 {
 
+}
+
+WebPage* WebPage::instance() {
+    return INSTANCE;
 }
 
 void WebPage::onCookieEdited(const QNetworkCookie &cookie) {
@@ -135,6 +144,13 @@ void WebPage::setInterceptors(QJsonObject &in, QJsonObject &out) {
     if(interceptors.size() > 0) {
         networkAccessManager->setInterceptors(interceptors);
     }
+}
+
+void WebPage::getWindowBounds(QJsonObject &in, QJsonObject &out) {
+    out.insert("x", MainWindow::instance()->x());
+    out.insert("y", MainWindow::instance()->y());
+    out.insert("width", MainWindow::instance()->width());
+    out.insert("height", MainWindow::instance()->height());
 }
 
 QImage WebPage::renderImage() {

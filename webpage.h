@@ -20,6 +20,7 @@ class WebPage: public QWebPage
 public:
     explicit WebPage(QObject* parent = NULL);
     ~WebPage();
+    static WebPage* instance();
 
 public:
     NetworkAccessManager* getNetworkAccessManager();
@@ -45,6 +46,7 @@ private:
     void setProxy(QJsonObject &in, QJsonObject &out);
     void setUserAgent(QJsonObject &in, QJsonObject &out);
     void setInterceptors(QJsonObject &in, QJsonObject &out);
+    void getWindowBounds(QJsonObject &in, QJsonObject &out);
 
 signals:
     void commandProcessed(QByteArray &data);

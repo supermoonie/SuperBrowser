@@ -8,6 +8,8 @@
 #include <QNetworkProxy>
 #include <QDebug>
 
+static MainWindow* INSTANCE = NULL;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     progress(0),
@@ -17,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     extractorEditorDialog(NULL),
     cookieOperatorDialog(NULL)
 {
+    INSTANCE = this;
     webSocketServer = new WebSocketServer(this);
     view = new QWebView(this);
     webPage = new WebPage(this);
@@ -84,6 +87,10 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
 
+}
+
+MainWindow* MainWindow::instance() {
+    return INSTANCE;
 }
 
 void MainWindow::onGetCookieActionTriggered() {
