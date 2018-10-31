@@ -29,7 +29,6 @@ private slots:
 
 signals:
     void cookieEdited(const QNetworkCookie &cookie);
-    void refreshButtonClicked();
     void clearCookie();
     void delCookie(const QNetworkCookie &cookie);
 

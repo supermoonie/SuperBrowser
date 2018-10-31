@@ -1,25 +1,75 @@
 # SuperBrowser
 super browser
 
-- 导航
-  - [x] navigate(url);
-- 配置
-  - setProxy(proxy)
-  - setUserAgent(ua)
-  - setInterceptor(interceptor)
-  - addExtractor(extractor)
-- cookie
-  - setCookie(cookie)
-  - setCookies([cookie])
-  - deleteCookie(cookieName, url)
-  - deleteCookies([cookieName, url])
-  - getCookies()
-  - getCookies([url,url])
-- 截图 & pdf
-- getResponse(extractor) & getResponse([extractor])
-- 缓存目录
-- 执行JavaScript
-- 日志输出
+- [ ] Debug
+  - [ ] File
+    - [ ] Open
+  - [x] Navigate
+  - [x] Server
+    - [x] Start
+    - [x] Stop
+  - [x] Settings
+    - [x] Proxy
+    - [x] User-Agent
+    - [x] Interceptor
+  - [x] Network
+    - [x] Extractor
+      - [x] show
+      - [x] Base64View
+        - [x] Base64ToStr
+        - [x] Base64ToImg
+      - [x] Add
+      - [x] Del
+      - [x] Clear
+    - [x] Cookie
+      - [x] show
+      - [x] Add
+      - [x] Del
+      - [x] Clear
+      - [x] Del
+  - [ ] Cache
+    - [ ] SetDirectory
+    - [ ] SetMaximumCacheSize
+      - [ ] Show CacheSize
+    - [ ] Remove
+
+- [ ] 将 Interceptor 移入 Network 中
+
+
+
+- [ ] Release
+  - [ ] Browser
+    - [x] navigate
+    - [ ] getWindowBounds
+    - [ ] setWindowBounds
+    - [ ] close
+  - [ ] Dom: loadStart List<QWebElement>
+    - [ ] Id
+    - [ ] Document
+    - [ ] QuerySelector(FindFirst)
+    - [ ] QuerySelectorAll(FindAll)
+    - [ ] GetGeometry
+  - [ ] Network
+    - [ ] SetCacheDirectory
+    - [ ] ClearCache
+    - [ ] DeleteCookie
+    - [ ] GetAllCookies
+    - [ ] GetCookides
+    - [ ] SetCookie
+    - [ ] SetCookies
+    - [ ] GetResponseBody
+    - [ ] GetRequestPostData
+    - [ ] SetBlockedURLs
+    - [ ] SetUserAgentOverride
+    - [ ] SetProxy
+  - [ ] Page
+    - [ ] CaptureScreenshot
+    - [ ] PrintToPDF
+    - [ ] Reload
+    - [ ] SetDocumentContent
+    - [ ] StopLoading
+  - [ ] Runtime
+    - [ ] Evaluate
 
 ```json
 {"name":"navigate","parameters":{"url":"https://ip.cn"}}
