@@ -12,6 +12,7 @@ super browser
     - [x] Proxy
     - [x] User-Agent
     - [x] Interceptor
+    - [ ] Develop Tools
   - [x] Network
     - [x] Extractor
       - [x] show
@@ -42,8 +43,9 @@ super browser
     - [x] navigate
     - [x] getWindowBounds
     - [x] setWindowBounds
-    - [ ] setWindowStates
-    - [ ] close
+    - [x] getWindowState
+    - [x] setWindowState
+    - [x] close
   - [ ] Dom: loadStart List<QWebElement>
     - [ ] Id
     - [ ] Document
@@ -61,9 +63,10 @@ super browser
     - [ ] GetResponseBody
     - [ ] GetRequestPostData
     - [ ] SetBlockedURLs
-    - [x] SetUserAgentOverride
     - [x] SetProxy
   - [ ] Page
+    - [ ] getUserAgent
+    - [ ] setUserAgent
     - [ ] CaptureScreenshot
     - [ ] PrintToPDF
     - [ ] Reload
@@ -96,7 +99,6 @@ super browser
         "commands": [
             {
                 "name": "navigate",
-                "desc": "Navigate",
                 "parameters": {
                     "url": "http://httpbin.org/get"
                 }
