@@ -30,6 +30,7 @@ WebPage::WebPage(QObject* parent):
     settings->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     settings->setOfflineStorageDefaultQuota(20*1024*1024);
     settings->setOfflineStoragePath(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
+    commandMap.insert("version", &WebPage::version);
     commandMap.insert("navigate", &WebPage::navigate);
     commandMap.insert("setProxy", &WebPage::setProxy);
     commandMap.insert("getUserAgent", &WebPage::getUserAgent);
@@ -41,6 +42,9 @@ WebPage::WebPage(QObject* parent):
     commandMap.insert("setWindowState", &WebPage::setWindowState);
     commandMap.insert("close", &WebPage::close);
     QNetworkProxyFactory::setUseSystemConfiguration(true);
+    connect(this, &WebPage::frameCreated, [=](QWebFrame * frame){
+        qDebug() << frame->frameName();
+    });
 }
 
 WebPage::~WebPage()
@@ -98,6 +102,11 @@ void WebPage::setInterceptors(const QList<QString> &interceptors) {
 }
 
 // Command
+void WebPage::version(QJsonObject &in, QJsonObject &out) {
+    out.insert("major", 1);
+    out.insert("minor", 0);
+}
+
 void WebPage::navigate(QJsonObject &in, QJsonObject &out) {
     QString url = in.value("params").toObject().value("url").toString("about:blank");
     this->currentFrame()->setUrl(QUrl::fromUserInput(url));

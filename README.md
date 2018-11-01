@@ -4,6 +4,7 @@ super browser
 - [ ] Debug
   - [ ] File
     - [ ] Open
+    - [ ] SetContent Ctrl + V
   - [x] Navigate
   - [x] Server
     - [x] Start
@@ -15,24 +16,27 @@ super browser
     - [ ] Develop Tools
   - [x] Network
     - [x] Extractor
-      - [x] show
+    - [x] show
       - [x] Base64View
-        - [x] Base64ToStr
-        - [x] Base64ToImg
-      - [x] Add
-      - [x] Del
-      - [x] Clear
-    - [x] Cookie
-      - [x] show
-      - [x] Add
-      - [x] Del
-      - [x] Clear
-      - [x] Del
+      - [x] Base64ToStr
+      - [x] Base64ToImg
+    - [x] Add
+    - [x] Del
+    - [x] Clear
+  - [x] Cookie
+    - [x] show
+    - [x] Add
+    - [x] Del
+    - [x] Clear
+    - [x] Del
   - [ ] Cache
     - [ ] SetDirectory
     - [ ] SetMaximumCacheSize
-      - [ ] Show CacheSize
+    - [ ] Show CacheSize
     - [ ] Remove
+  - [ ] Mail
+    - [ ] login
+    - [ ] receive
 
 - [ ] 将 Interceptor 移入 Network 中
 
@@ -40,6 +44,7 @@ super browser
 
 - [ ] Release
   - [ ] Browser
+    - [x] version
     - [x] navigate
     - [x] getWindowBounds
     - [x] setWindowBounds
@@ -67,6 +72,18 @@ super browser
   - [ ] Page
     - [x] getUserAgent
     - [x] setUserAgent
+    - [ ] hasAlert
+    - [ ] alertText
+    - [ ] acceptAlert
+    - [ ] hasConfirm
+    - [ ] confirmText
+    - [ ] acceptConfirm(true/false)
+    - [ ] hasPrompt
+    - [ ] setPromptInputValue
+    - [ ] acceptPrompt(true/false)
+    - [ ] setHtml
+    - [ ] toHtml
+    - [ ] toPlainText
     - [ ] CaptureScreenshot
     - [ ] PrintToPDF
     - [ ] Reload
@@ -80,33 +97,6 @@ super browser
     "version": {
         "major": 1,
         "minor": 0
-    },
-    "domains": {
-        "domain": "Browser",
-        "types": [
-            {
-                "id": "WindowState",
-                "type": "string",
-                "enum": [
-                    "normal",
-                    "minimized",
-                    "maximized",
-                    "fullscreen",
-                    "active"
-                ]
-            }
-        ],
-        "commands": [
-            {
-                "name": "navigate",
-                "parameters": {
-                    "url": "http://httpbin.org/get"
-                }
-            },
-            {
-                "name": "getWindowBounds"
-            }
-        ]
     }
 }
 ```
