@@ -12,6 +12,8 @@ class WebSocketServer : public QWebSocketServer
 public:
     explicit WebSocketServer(QObject *parent = 0);
     ~WebSocketServer();
+    static WebSocketServer* instance();
+    void exit();
 
 private:
     QList<QWebSocket*> clients;
@@ -23,8 +25,6 @@ private slots:
 
 signals:
     void commandReceived(QWebSocket* client, const QString &command);
-
-public slots:
 
 };
 

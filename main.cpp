@@ -7,6 +7,8 @@
 //#include "superbrowser.h"
 #include "mainwindow.h"
 #include <QUrl>
+#include <QDesktopWidget>
+#include <QRect>
 
 int main(int argc, char *argv[])
 {
@@ -20,8 +22,8 @@ int main(int argc, char *argv[])
     //    terminal->cout("path: ", false);
     //    terminal->cout(path, true);
     //    SuperBrowser browser(&app);
-    qDebug() << QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
-    qDebug() << QUrl("").isValid();
+//    qDebug() << QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+//    qDebug() << QUrl("").isValid();
 #ifdef QT_NOT_DEBUG
     QCommandLineParser commandLineParser;
     commandLineParser.addHelpOption();
@@ -54,6 +56,11 @@ int main(int argc, char *argv[])
     }
     window.show();
 #else
+    QDesktopWidget* desktopWidget = QApplication::desktop();
+    QRect clientRect = desktopWidget->availableGeometry();
+    qDebug() << clientRect.left() << clientRect.top() << clientRect.width() << clientRect.height();
+    QRect applicationRect = desktopWidget->screenGeometry();
+    qDebug() << applicationRect.left() << applicationRect.top() << applicationRect.width() << applicationRect.height();
     MainWindow window;
     window.show();
 #endif

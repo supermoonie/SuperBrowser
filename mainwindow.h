@@ -22,6 +22,7 @@ public:
     ~MainWindow();
     static MainWindow* instance();
 
+
 private:
     QWebView *view;
     WebPage* webPage;
@@ -69,8 +70,6 @@ private slots:
     // Extractor
 
 signals:
-
-public slots:
 
 };
 

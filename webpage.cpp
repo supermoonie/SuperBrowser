@@ -6,6 +6,8 @@
 #include <QNetworkProxy>
 #include <QDebug>
 #include <QStandardPaths>
+#include <QApplication>
+#include "websocketserver.h"
 #include "mainwindow.h"
 
 static WebPage* INSTANCE = NULL;
@@ -34,6 +36,9 @@ WebPage::WebPage(QObject* parent):
     commandMap.insert("setInterceptors", &WebPage::setInterceptors);
     commandMap.insert("getWindowBounds", &WebPage::getWindowBounds);
     commandMap.insert("setWindowBounds", &WebPage::setWindowBounds);
+    commandMap.insert("getWindowState", &WebPage::getWindowState);
+    commandMap.insert("setWindowState", &WebPage::setWindowState);
+    commandMap.insert("close", &WebPage::close);
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 }
 
@@ -91,13 +96,14 @@ void WebPage::setInterceptors(const QList<QString> &interceptors) {
     networkAccessManager->setInterceptors(interceptors);
 }
 
+// Command
 void WebPage::navigate(QJsonObject &in, QJsonObject &out) {
-    QString url = in.value("parameters").toObject().value("url").toString("about:blank");
+    QString url = in.value("params").toObject().value("url").toString("about:blank");
     this->currentFrame()->setUrl(QUrl::fromUserInput(url));
 }
 
 void WebPage::setProxy(QJsonObject &in, QJsonObject &out) {
-    QJsonObject proxyJson = in.value("parameters").toObject();
+    QJsonObject proxyJson = in.value("params").toObject();
     QNetworkProxy proxy;
     QString type = proxyJson.value("type").toString();
     if("NO_PROXY" == type) {
@@ -125,7 +131,7 @@ void WebPage::setProxy(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::setUserAgent(QJsonObject &in, QJsonObject &out) {
-    QJsonObject userAgentJson = in.value("parameters").toObject();
+    QJsonObject userAgentJson = in.value("params").toObject();
     QString ua = userAgentJson.value("userAgent").toString();
     if(!ua.isEmpty()) {
         setUserAgent(ua);
@@ -133,7 +139,7 @@ void WebPage::setUserAgent(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::setInterceptors(QJsonObject &in, QJsonObject &out) {
-    QJsonArray interceptorsArr = in.value("parameters").toArray();
+    QJsonArray interceptorsArr = in.value("params").toArray();
     QList<QString> interceptors;
     for(int i = 0; i < interceptorsArr.size(); i ++) {
         QString interceptor = interceptorsArr.at(i).toString("");
@@ -148,22 +154,72 @@ void WebPage::setInterceptors(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::getWindowBounds(QJsonObject &in, QJsonObject &out) {
-    out.insert("x", MainWindow::instance()->x());
-    out.insert("y", MainWindow::instance()->y());
-    out.insert("width", MainWindow::instance()->width());
-    out.insert("height", MainWindow::instance()->height());
+    QRect rect = MainWindow::instance()->frameGeometry();
+    out.insert("x", rect.x());
+    out.insert("y", rect.y());
+    out.insert("width", rect.width());
+    out.insert("height", rect.height());
 }
 
 void WebPage::setWindowBounds(QJsonObject &in, QJsonObject &out) {
-    QJsonObject boundsJson = in.value("parameters").toObject();
+    QJsonObject boundsJson = in.value("params").toObject();
     if(boundsJson.contains("bounds")) {
         boundsJson = boundsJson.value("bounds").toObject();
     }
-    int x = boundsJson.value("x").toInt();
-    int y = boundsJson.value("y").toInt();
-    int width = boundsJson.value("width").toInt(800);
-    int height = boundsJson.value("height").toInt(600);
-    MainWindow::instance()->setGeometry(x, y, width, height);
+    MainWindow* window = MainWindow::instance();
+    QRect frameGeometry = window->frameGeometry();
+    QRect geometry = window->geometry();
+    int xDiff = geometry.x() - frameGeometry.x();
+    int yDiff = geometry.y() - frameGeometry.y();
+    int wDiff = frameGeometry.width() - geometry.width();
+    int hDiff = frameGeometry.height() - geometry.height();
+    int x = boundsJson.value("x").toInt(frameGeometry.x());
+    int y = boundsJson.value("y").toInt(frameGeometry.y());
+    int width = boundsJson.value("width").toInt(frameGeometry.width());
+    int height = boundsJson.value("height").toInt(frameGeometry.width());
+    MainWindow::instance()->setGeometry(x + xDiff, y + yDiff, width - wDiff, height - hDiff);
+}
+
+void WebPage::getWindowState(QJsonObject &in, QJsonObject &out) {
+    Qt::WindowStates windowState = MainWindow::instance()->windowState();
+    QString state;
+    switch (windowState) {
+    case Qt::WindowNoState:
+        state = "normal";
+        break;
+    case Qt::WindowMinimized:
+        state = "minimized";
+        break;
+    case Qt::WindowMaximized:
+        state = "maximized";
+        break;
+    case Qt::WindowFullScreen:
+        state = "fullscreen";
+        break;
+    case Qt::WindowActive:
+        state = "active";
+        break;
+    default:
+        state = "unknow";
+        break;
+    }
+    out.insert("state", state);
+}
+
+void WebPage::setWindowState(QJsonObject &in, QJsonObject &out) {
+    QString state = in.value("params").toObject().value("state").toString("normal");
+    MainWindow* window = MainWindow::instance();
+    if(state == "normal" && Qt::WindowNoState != window->windowState()) {
+        window->showNormal();
+    } else if(state == "minimized" && !window->isMinimized()) {
+        window->showMinimized();
+    } else if(state == "maximized" && !window->isMaximized()) {
+        window->showMaximized();
+    } else if(state == "fullscreen" && !window->isFullScreen()) {
+        window->showFullScreen();
+    } else if(state == "active" && !window->isActiveWindow()) {
+        window->activateWindow();
+    }
 }
 
 QImage WebPage::renderImage() {
@@ -203,6 +259,12 @@ QImage WebPage::renderImage() {
         }
     }
     return buffer;
+}
+
+void WebPage::close(QJsonObject &in, QJsonObject &out) {
+    WebSocketServer::instance()->exit();
+    MainWindow::instance()->close();
+    QApplication::exit(0);
 }
 
 void WebPage::onCommandReceived(QWebSocket* client, const QString &command) {

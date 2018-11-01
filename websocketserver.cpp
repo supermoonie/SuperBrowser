@@ -1,8 +1,11 @@
 #include "websocketserver.h"
 
+static WebSocketServer* INSTANCE = NULL;
+
 WebSocketServer::WebSocketServer(QObject *parent) :
     QWebSocketServer("BrowserServer", QWebSocketServer::NonSecureMode, parent)
 {
+    INSTANCE = this;
     connect(this, &WebSocketServer::newConnection, this, &WebSocketServer::onNewConnection);
 }
 
@@ -10,6 +13,10 @@ WebSocketServer::~WebSocketServer()
 {
     this->close();
     qDeleteAll(clients.begin(), clients.end());
+}
+
+WebSocketServer* WebSocketServer::instance() {
+    return INSTANCE;
 }
 
 void WebSocketServer::onNewConnection() {
@@ -30,5 +37,12 @@ void WebSocketServer::onDisconnect() {
     if(client) {
         clients.removeAll(client);
         client->deleteLater();
+    }
+}
+
+void WebSocketServer::exit() {
+    for(QWebSocket* client: clients) {
+        client->disconnect();
+        client->close();
     }
 }

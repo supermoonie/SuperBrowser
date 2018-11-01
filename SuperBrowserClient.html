@@ -38,27 +38,42 @@
                 <p><strong>Browser :</strong></p>
         		<pre>
 {
-    "name": "navigate",
-    "parameters": {
-        "url": "https://ip.cn"
-    }
-}
-{
-    "name": "getWindowBounds",
-    "parameters": {}
-}
-{
-    "name": "setWindowBounds",
-    "parameters": {
-        "bounds": {
-            "x": 0,
-            "y": 0,
-            "width": 800,
-            "height": 600
-        }
-    }
+  "name": "navigate",
+  "params": {
+    "url": "https://ip.cn"
+  }
 }
 
+{
+  "name": "getWindowBounds"
+}
+
+{
+  "name": "setWindowBounds",
+  "params": {
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 800,
+      "height": 600
+    }
+  }
+}
+
+{
+  "name": "getWindowState"
+}
+
+{
+  "name": "setWindowState",
+  "params": {
+    "state": "normal/minimized/maximized/fullscreen/active"
+  }
+}
+
+{
+  "name": "close"
+}
         		</pre>
                 <pre>
 

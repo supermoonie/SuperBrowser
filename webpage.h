@@ -48,6 +48,9 @@ private:
     void setInterceptors(QJsonObject &in, QJsonObject &out);
     void getWindowBounds(QJsonObject &in, QJsonObject &out);
     void setWindowBounds(QJsonObject &in, QJsonObject &out);
+    void getWindowState(QJsonObject &in, QJsonObject &out);
+    void setWindowState(QJsonObject &in, QJsonObject &out);
+    void close(QJsonObject &in, QJsonObject &out);
 
 signals:
     void commandProcessed(QByteArray &data);

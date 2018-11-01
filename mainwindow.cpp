@@ -6,6 +6,7 @@
 #include <QAction>
 #include <QInputDialog>
 #include <QNetworkProxy>
+#include <QStatusBar>
 #include <QDebug>
 
 static MainWindow* INSTANCE = NULL;
@@ -35,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     locationEdit->setSizePolicy(QSizePolicy::Expanding, locationEdit->sizePolicy().verticalPolicy());
     connect(locationEdit, &QLineEdit::returnPressed, this, &MainWindow::changeLocation);
 
+    // ToolBar
     QToolBar *toolBar = addToolBar(tr("Navigation"));
     toolBar->setMovable(false);
     toolBar->addAction(view->pageAction(QWebPage::Back));
@@ -42,6 +44,9 @@ MainWindow::MainWindow(QWidget *parent) :
     toolBar->addAction(view->pageAction(QWebPage::Reload));
     toolBar->addAction(view->pageAction(QWebPage::Stop));
     toolBar->addWidget(locationEdit);
+    // ToolBar
+
+    statusBar();
 
     // Server
     QMenu* serverMenu = menuBar()->addMenu("Server");
@@ -83,7 +88,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setCentralWidget(view);
     setUnifiedTitleAndToolBarOnMac(true);
-
 }
 
 MainWindow::~MainWindow()
@@ -204,6 +208,7 @@ void MainWindow::onServerDialogAccepted() {
     if(!webSocketServer->listen(QHostAddress::Any, port)) {
         QMessageBox::warning(this, "warn", QString("could not listen on %1!").arg(port));
     } else {
+        statusBar()->showMessage(QString("listening on %1").arg(port));
         startAction->setDisabled(true);
         stopAction->setEnabled(true);
     }
