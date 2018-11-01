@@ -32,6 +32,7 @@ WebPage::WebPage(QObject* parent):
     settings->setOfflineStoragePath(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
     commandMap.insert("navigate", &WebPage::navigate);
     commandMap.insert("setProxy", &WebPage::setProxy);
+    commandMap.insert("getUserAgent", &WebPage::getUserAgent);
     commandMap.insert("setUserAgent", &WebPage::setUserAgent);
     commandMap.insert("setInterceptors", &WebPage::setInterceptors);
     commandMap.insert("getWindowBounds", &WebPage::getWindowBounds);
@@ -106,10 +107,10 @@ void WebPage::setProxy(QJsonObject &in, QJsonObject &out) {
     QJsonObject proxyJson = in.value("params").toObject();
     QNetworkProxy proxy;
     QString type = proxyJson.value("type").toString();
-    if("NO_PROXY" == type) {
+    if("NoProxy" == type) {
         proxy.setType(QNetworkProxy::NoProxy);
     } else {
-        if("SOCKS5_PROXY" == type) {
+        if("Socks5Proxy" == type) {
             proxy.setType(QNetworkProxy::Socks5Proxy);
         } else {
             proxy.setType(QNetworkProxy::HttpProxy);
@@ -118,16 +119,20 @@ void WebPage::setProxy(QJsonObject &in, QJsonObject &out) {
         int port = proxyJson.value("port").toInt();
         proxy.setHostName(host);
         proxy.setPort(port);
-        QString username = in.value("username").toString();
+        QString username = in.value("userName").toString();
         if(!username.isNull() && !username.isEmpty()) {
             proxy.setUser(username);
         }
-        QString password = in.value("password").toString();
+        QString password = in.value("passWord").toString();
         if(!password.isNull() && !password.isEmpty()) {
             proxy.setPassword(password);
         }
     }
     QNetworkProxy::setApplicationProxy(proxy);
+}
+
+void WebPage::getUserAgent(QJsonObject &in, QJsonObject &out) {
+    out.insert("userAgent", this->userAgent);
 }
 
 void WebPage::setUserAgent(QJsonObject &in, QJsonObject &out) {
@@ -222,6 +227,12 @@ void WebPage::setWindowState(QJsonObject &in, QJsonObject &out) {
     }
 }
 
+void WebPage::close(QJsonObject &in, QJsonObject &out) {
+    WebSocketServer::instance()->exit();
+    MainWindow::instance()->close();
+    QApplication::exit(0);
+}
+
 QImage WebPage::renderImage() {
     QRect frameRect;
     QSize viewportSize = this->viewportSize();
@@ -259,12 +270,6 @@ QImage WebPage::renderImage() {
         }
     }
     return buffer;
-}
-
-void WebPage::close(QJsonObject &in, QJsonObject &out) {
-    WebSocketServer::instance()->exit();
-    MainWindow::instance()->close();
-    QApplication::exit(0);
 }
 
 void WebPage::onCommandReceived(QWebSocket* client, const QString &command) {

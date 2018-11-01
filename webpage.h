@@ -44,6 +44,7 @@ private:
 private:
     void navigate(QJsonObject &in, QJsonObject &out);
     void setProxy(QJsonObject &in, QJsonObject &out);
+    void getUserAgent(QJsonObject &in, QJsonObject &out);
     void setUserAgent(QJsonObject &in, QJsonObject &out);
     void setInterceptors(QJsonObject &in, QJsonObject &out);
     void getWindowBounds(QJsonObject &in, QJsonObject &out);

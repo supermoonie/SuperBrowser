@@ -13,70 +13,247 @@
             #right pre{
                 padding-left: 20px;
             }
+            #left p{
+            	width: 470px;
+            }
         </style>
     </head>
     <body class="main">
         <h1>WebSocket Client</h1>
         <div id="main" style="width: 980px; min-height: 550px;">
-        	<div id="left" style="width: 469px; min-height: 550px; padding-left: 10px; padding-right: 10px; border-right: 1px dashed #ccc; float: left;">
-        		<p style="width: 469px;">
+        	<div id="left" style="width: 470px; min-height: 550px; padding-left: 10px; padding-right: 10px; float: left;">
+        		<p>
 		            <button onClick="initWebSocket();">Connect</button>
 		            <button onClick="stopWebSocket();">Disconnect</button>
 		            <button onClick="checkSocket();">State</button>
 		        </p>
-		        <p style="width: 469px;">
-		            <textarea id="debugTextArea" style="width: 467px; height:200px; font-size: 14px; resize: none; padding: 0px;"></textarea>
+		        <p>
+		            <textarea id="debugTextArea" style="width: 467px; height:500px; font-size: 14px; resize: none; padding: 0px;"></textarea>
 		        </p>
-		        <p style="width: 469px;">
+		        <p>
 		            <textarea id="inputText" style="width: 467px; height:200px; font-size: 14px; resize: none; padding: 0px;"></textarea>
-		        </p style="width: 469px;">
-		        <p style="width: 469px; text-align: right;">
+		        </p>
+		        <p style="text-align: right;">
 		        	<button onClick="sendMessage();">Send</button>
 		        </p>
         	</div>
-        	<div id="right" style="width: 480px; min-height: 550px; float: right; padding-left: 10px;">
+        	<div id="right" style="width: 479px; min-height: 550px; float: right; padding-left: 10px; border-left: 1px dashed #ccc;">
                 <p><strong>Browser :</strong></p>
         		<pre>
 {
-  "name": "navigate",
-  "params": {
-    "url": "https://ip.cn"
-  }
-}
-
-{
-  "name": "getWindowBounds"
-}
-
-{
-  "name": "setWindowBounds",
-  "params": {
-    "bounds": {
-      "x": 0,
-      "y": 0,
-      "width": 800,
-      "height": 600
+  "types": [
+    {
+      "name": "WindowState",
+      "type": "string",
+      "enum": [
+        "normal",
+        "minimized",
+        "maximized",
+        "fullscreen",
+        "active"
+      ]
+    },
+    {
+      "name": "Bounds",
+      "type": "object",
+      "properties": [
+        {
+          "name": "x",
+          "type": "integer"
+        },
+        {
+          "name": "y",
+          "type": "integer"
+        },
+        {
+          "name": "width",
+          "type": "integer"
+        },
+        {
+          "name": "height",
+          "type": "integer"
+        }
+      ]
     }
-  }
-}
-
-{
-  "name": "getWindowState"
-}
-
-{
-  "name": "setWindowState",
-  "params": {
-    "state": "normal/minimized/maximized/fullscreen/active"
-  }
-}
-
-{
-  "name": "close"
+  ],
+  "commands": [
+    {
+      "name": "navigate",
+      "params": [
+        {
+          "name": "url",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "getWindowBounds",
+      "return": {
+        "name": "bounds",
+        "$ref": "Bounds"
+      }
+    },
+    {
+      "name": "setWindowBounds",
+      "params": [
+        {
+          "name": "bounds",
+          "$ref": "Bounds"
+        }
+      ]
+    },
+    {
+      "name": "getWindowState",
+      "return": {
+        "name": "state",
+        "$ref": "WindowState"
+      }
+    },
+    {
+      "name": "setWindowState",
+      "params": [
+        {
+          "name": "state",
+          "$ref": "WindowState"
+        }
+      ]
+    },
+    {
+      "name": "close"
+    }
+  ],
+  "examples": [
+    {
+      "name": "navigate",
+      "params": {
+        "url": "https://ip.cn"
+      }
+    },
+    {
+      "name": "getWindowBounds"
+    },
+    {
+      "name": "setWindowBounds",
+      "params": {
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 800,
+          "height": 600
+        }
+      }
+    },
+    {
+      "name": "getWindowState"
+    },
+    {
+      "name": "setWindowState",
+      "params": {
+        "state": "normal"
+      }
+    },
+    {
+      "name": "close"
+    }
+  ]
 }
         		</pre>
+        		<p><strong>Page</strong></p>
                 <pre>
-
+{
+  "commands": [
+    {
+      "name": "getUserAgent",
+      "return": {
+        "name": "userAgent",
+        "type": "string"
+      }
+    },
+    {
+      "name": "setUserAgent",
+      "params": [
+        {
+          "name": "userAgent",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "name": "getUserAgent"
+    },
+    {
+      "name": "setUserAgent",
+      "params": {
+        "userAgent": "Hello SuperBrowser!"
+      }
+    }
+  ]
+}
+                </pre>
+                <p><strong>Network</strong></p>
+                <pre>
+{
+  "types": [
+    {
+      "name": "ProxyType",
+      "type": "string",
+      "enum": [
+        "HttpProxy",
+        "Socks5Proxy",
+        "NoProxy"
+      ]
+    },
+    {
+      "name": "Proxy",
+      "type": "object",
+      "properties": [
+        {
+          "name": "host",
+          "type": "string"
+        },
+        {
+          "name": "port",
+          "type": "integer"
+        },
+        {
+          "name": "type",
+          "$ref", "ProxyType"
+        },
+        {
+          "name": "userName",
+          "type": "string"
+        },
+        {
+          "name": "passWord",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "name": "setProxy",
+      "params": {
+        "name": "proxy",
+        "$ref": "Proxy"
+      }
+    }
+  ],
+  "examples": [
+    {
+      "name": "setProxy",
+      "params": {
+        "host": "127.0.0.1",
+        "port": "8888",
+        "type": "HttpProxy",
+        "userName": "",
+        "passWord": ""
+      }
+    }
+  ]
+}
                 </pre>
         	</div>
         	

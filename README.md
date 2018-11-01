@@ -65,8 +65,8 @@ super browser
     - [ ] SetBlockedURLs
     - [x] SetProxy
   - [ ] Page
-    - [ ] getUserAgent
-    - [ ] setUserAgent
+    - [x] getUserAgent
+    - [x] setUserAgent
     - [ ] CaptureScreenshot
     - [ ] PrintToPDF
     - [ ] Reload
