@@ -30,7 +30,7 @@ WebPage::WebPage(QObject* parent):
     settings->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     settings->setOfflineStorageDefaultQuota(20*1024*1024);
     settings->setOfflineStoragePath(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
-    commandMap.insert("version", &WebPage::version);
+    commandMap.insert("getVersion", &WebPage::getVersion);
     commandMap.insert("navigate", &WebPage::navigate);
     commandMap.insert("setProxy", &WebPage::setProxy);
     commandMap.insert("getUserAgent", &WebPage::getUserAgent);
@@ -42,9 +42,6 @@ WebPage::WebPage(QObject* parent):
     commandMap.insert("setWindowState", &WebPage::setWindowState);
     commandMap.insert("close", &WebPage::close);
     QNetworkProxyFactory::setUseSystemConfiguration(true);
-    connect(this, &WebPage::frameCreated, [=](QWebFrame * frame){
-        qDebug() << frame->frameName();
-    });
 }
 
 WebPage::~WebPage()
@@ -102,9 +99,11 @@ void WebPage::setInterceptors(const QList<QString> &interceptors) {
 }
 
 // Command
-void WebPage::version(QJsonObject &in, QJsonObject &out) {
-    out.insert("major", 1);
-    out.insert("minor", 0);
+void WebPage::getVersion(QJsonObject &in, QJsonObject &out) {
+    QJsonObject result;
+    result.insert("major", 1);
+    result.insert("minor", 0);
+    out.insert("result", result);
 }
 
 void WebPage::navigate(QJsonObject &in, QJsonObject &out) {
@@ -114,6 +113,8 @@ void WebPage::navigate(QJsonObject &in, QJsonObject &out) {
 
 void WebPage::setProxy(QJsonObject &in, QJsonObject &out) {
     QJsonObject proxyJson = in.value("params").toObject();
+    QJsonDocument document(proxyJson);
+    qDebug() << QString(document.toJson());
     QNetworkProxy proxy;
     QString type = proxyJson.value("type").toString();
     if("NoProxy" == type) {
@@ -141,7 +142,9 @@ void WebPage::setProxy(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::getUserAgent(QJsonObject &in, QJsonObject &out) {
-    out.insert("userAgent", this->userAgent);
+    QJsonObject userAgentJson;
+    userAgentJson.insert("userAgent", this->userAgent);
+    out.insert("result", userAgentJson);
 }
 
 void WebPage::setUserAgent(QJsonObject &in, QJsonObject &out) {
@@ -195,6 +198,7 @@ void WebPage::setWindowBounds(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::getWindowState(QJsonObject &in, QJsonObject &out) {
+    QJsonObject result;
     Qt::WindowStates windowState = MainWindow::instance()->windowState();
     QString state;
     switch (windowState) {
@@ -217,7 +221,8 @@ void WebPage::getWindowState(QJsonObject &in, QJsonObject &out) {
         state = "unknow";
         break;
     }
-    out.insert("state", state);
+    result.insert("state", state);
+    out.insert("result", result);
 }
 
 void WebPage::setWindowState(QJsonObject &in, QJsonObject &out) {
@@ -282,6 +287,7 @@ QImage WebPage::renderImage() {
 }
 
 void WebPage::onCommandReceived(QWebSocket* client, const QString &command) {
+    qDebug() << command;
     QJsonParseError* parseError = new QJsonParseError;
     QJsonDocument commandJsonDocument = QJsonDocument::fromJson(command.toUtf8(), parseError);
     if(parseError->error != QJsonParseError::NoError) {
@@ -293,25 +299,35 @@ void WebPage::onCommandReceived(QWebSocket* client, const QString &command) {
         return;
     }
     QJsonObject commandJson = commandJsonDocument.object();
-    QString name = commandJson.value("name").toString();
-    if(name.isNull() || name.isEmpty()) {
+    int id = commandJson.value("id").toInt(-1);
+    if(-1 == id) {
         QJsonObject errorJson;
-        errorJson.insert("error", "name lost");
+        errorJson.insert("error", "id lost");
         QByteArray errorResult = QJsonDocument(errorJson).toJson();
         client->sendTextMessage(QString(errorResult));
         client->flush();
         return;
     }
-    if(!commandMap.contains(name)) {
+    QString method = commandJson.value("method").toString();
+    if(method.isNull() || method.isEmpty()) {
         QJsonObject errorJson;
-        errorJson.insert("error", name + " not support");
+        errorJson.insert("error", "method lost");
         QByteArray errorResult = QJsonDocument(errorJson).toJson();
         client->sendTextMessage(QString(errorResult));
         client->flush();
         return;
     }
-    FUN fun = commandMap.value(name);
+    if(!commandMap.contains(method)) {
+        QJsonObject errorJson;
+        errorJson.insert("error", method + " not support");
+        QByteArray errorResult = QJsonDocument(errorJson).toJson();
+        client->sendTextMessage(QString(errorResult));
+        client->flush();
+        return;
+    }
+    FUN fun = commandMap.value(method);
     QJsonObject result;
+    result.insert("id", id);
     (this->*fun)(commandJson, result);
     QByteArray resultData = QJsonDocument(result).toJson();
     client->sendTextMessage(QString(resultData));

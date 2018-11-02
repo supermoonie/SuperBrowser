@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(userAgentAction, &QAction::triggered, this, &MainWindow::onUserAgentActionTriggered);
     settingsMenu->addAction(userAgentAction);
 
-    QAction* interceptorAction = new QAction("Interceptor", this);
+    QAction* interceptorAction = new QAction("BlockUrls", this);
     settingsMenu->addAction(interceptorAction);
     connect(interceptorAction, &QAction::triggered, this, &MainWindow::onInterceptorActionTriggered);
     // Settings

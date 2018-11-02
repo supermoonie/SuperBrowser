@@ -25,7 +25,8 @@ super browser
     - [x] Clear
   - [x] Cookie
     - [x] show
-    - [x] Add
+    - [x] Add 
+      - [ ] 增加 parse
     - [x] Del
     - [x] Clear
     - [x] Del
@@ -51,7 +52,7 @@ super browser
     - [x] getWindowState
     - [x] setWindowState
     - [x] close
-  - [ ] Dom: loadStart List<QWebElement>
+  - [ ] Dom: loadStart List\<QWebElement>
     - [ ] Id
     - [ ] Document
     - [ ] QuerySelector(FindFirst)
@@ -67,8 +68,8 @@ super browser
     - [ ] SetCookies
     - [ ] GetResponseBody
     - [ ] GetRequestPostData
-    - [ ] SetBlockedURLs
-    - [x] SetProxy
+    - [ ] setBlockedURLs
+    - [x] setProxy
   - [ ] Page
     - [x] getUserAgent
     - [x] setUserAgent

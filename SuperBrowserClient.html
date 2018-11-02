@@ -142,7 +142,7 @@
     {
       "name": "navigate",
       "params": {
-        "url": "https://ip.cn"
+        "url": "https://httpbing.org/get"
       }
     },
     {
@@ -262,7 +262,7 @@
       "name": "setProxy",
       "params": {
         "host": "127.0.0.1",
-        "port": "8888",
+        "port": 8888,
         "type": "HttpProxy",
         "userName": "",
         "passWord": ""
@@ -290,7 +290,7 @@
                 var msg = document.getElementById("inputText").value;
                 if ( websocket != null )
                 {
-                    document.getElementById("inputText").value = "";
+                    // document.getElementById("inputText").value = "";
                     websocket.send( msg );
                     console.log( "string sent :", '"'+msg+'"' );
                 }

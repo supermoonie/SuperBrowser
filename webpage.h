@@ -42,7 +42,7 @@ private:
     QMap<QString, FUN> commandMap;
 
 private:
-    void version(QJsonObject &in, QJsonObject &out);
+    void getVersion(QJsonObject &in, QJsonObject &out);
     void navigate(QJsonObject &in, QJsonObject &out);
     void setProxy(QJsonObject &in, QJsonObject &out);
     void getUserAgent(QJsonObject &in, QJsonObject &out);
