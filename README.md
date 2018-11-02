@@ -71,6 +71,8 @@ super browser
     - [ ] setBlockedURLs
     - [x] setProxy
   - [ ] Page
+    - [ ] currentUrl
+    - [ ] progress
     - [x] getUserAgent
     - [x] setUserAgent
     - [ ] hasAlert
