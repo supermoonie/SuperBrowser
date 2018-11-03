@@ -18,8 +18,8 @@ super browser
     - [x] Extractor
     - [x] show
       - [x] Base64View
-      - [x] Base64ToStr
-      - [x] Base64ToImg
+        - [x] Base64ToStr
+        - [x] Base64ToImg
     - [x] Add
     - [x] Del
     - [x] Clear

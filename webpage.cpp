@@ -172,10 +172,12 @@ void WebPage::setInterceptors(QJsonObject &in, QJsonObject &out) {
 
 void WebPage::getWindowBounds(QJsonObject &in, QJsonObject &out) {
     QRect rect = MainWindow::instance()->frameGeometry();
-    out.insert("x", rect.x());
-    out.insert("y", rect.y());
-    out.insert("width", rect.width());
-    out.insert("height", rect.height());
+    QJsonObject result;
+    result.insert("x", rect.x());
+    result.insert("y", rect.y());
+    result.insert("width", rect.width());
+    result.insert("height", rect.height());
+    out.insert("result", result);
 }
 
 void WebPage::setWindowBounds(QJsonObject &in, QJsonObject &out) {
@@ -242,9 +244,7 @@ void WebPage::setWindowState(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::close(QJsonObject &in, QJsonObject &out) {
-    WebSocketServer::instance()->exit();
-    MainWindow::instance()->close();
-    QApplication::exit(0);
+
 }
 
 QImage WebPage::renderImage() {
@@ -332,4 +332,9 @@ void WebPage::onCommandReceived(QWebSocket* client, const QString &command) {
     QByteArray resultData = QJsonDocument(result).toJson();
     client->sendTextMessage(QString(resultData));
     client->flush();
+    if(method == "close") {
+        connect(client, &QWebSocket::disconnected, [](){
+            QApplication::exit();
+        });
+    }
 }

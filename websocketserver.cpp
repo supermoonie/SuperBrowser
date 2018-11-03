@@ -1,4 +1,5 @@
 #include "websocketserver.h"
+#include <QApplication>
 
 static WebSocketServer* INSTANCE = NULL;
 
@@ -19,8 +20,16 @@ WebSocketServer* WebSocketServer::instance() {
     return INSTANCE;
 }
 
+void WebSocketServer::sendTextMessageToAllClient(const QString &message) {
+    for(QWebSocket* client: clients) {
+        client->sendTextMessage(message);
+        client->flush();
+    }
+}
+
 void WebSocketServer::onNewConnection() {
     QWebSocket* webSocket = this->nextPendingConnection();
+    clients << webSocket;
     connect(webSocket, &QWebSocket::textMessageReceived, this, &WebSocketServer::onTextMessageReceived);
     connect(webSocket, &QWebSocket::disconnected, this, &WebSocketServer::onDisconnect);
 }
@@ -37,12 +46,5 @@ void WebSocketServer::onDisconnect() {
     if(client) {
         clients.removeAll(client);
         client->deleteLater();
-    }
-}
-
-void WebSocketServer::exit() {
-    for(QWebSocket* client: clients) {
-        client->disconnect();
-        client->close();
     }
 }

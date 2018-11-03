@@ -13,7 +13,7 @@ public:
     explicit WebSocketServer(QObject *parent = 0);
     ~WebSocketServer();
     static WebSocketServer* instance();
-    void exit();
+    void sendTextMessageToAllClient(const QString &message);
 
 private:
     QList<QWebSocket*> clients;
