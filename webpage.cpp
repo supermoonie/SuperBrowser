@@ -42,6 +42,13 @@ WebPage::WebPage(QObject* parent):
     commandMap.insert("setWindowState", &WebPage::setWindowState);
     commandMap.insert("close", &WebPage::close);
     QNetworkProxyFactory::setUseSystemConfiguration(true);
+    connect(this, &WebPage::loadFinished, [](){
+        QJsonObject data;
+        data.insert("event", "loadFinished");
+        QJsonObject result;
+        data.insert("result", result);
+        WebSocketServer::instance()->sendTextMessageToAllClient(QString(QJsonDocument(data).toJson()));
+    });
 }
 
 WebPage::~WebPage()
