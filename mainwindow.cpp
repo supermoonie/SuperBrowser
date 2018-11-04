@@ -99,6 +99,10 @@ MainWindow* MainWindow::instance() {
     return INSTANCE;
 }
 
+QWebView* MainWindow::getWebView() {
+    return view;
+}
+
 void MainWindow::onGetCookieActionTriggered() {
     if(cookieOperatorDialog == NULL) {
         cookieOperatorDialog = new CookieOperatorDialog(this);

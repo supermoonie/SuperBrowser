@@ -6,6 +6,9 @@ NetworkAccessManager::NetworkAccessManager(MemoryCookieJar *cookieJar, QObject *
     this->cookieJar = cookieJar;
     this->setCookieJar(cookieJar);
     diskCache = new QNetworkDiskCache(this);
+    connect(this, &NetworkAccessManager::sslErrors, [](QNetworkReply * reply, const QList<QSslError> & errors){
+        reply->ignoreSslErrors();
+    });
 }
 
 NetworkAccessManager::~NetworkAccessManager()

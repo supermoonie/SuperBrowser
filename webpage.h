@@ -8,6 +8,7 @@
 #include <QWebSocket>
 #include <QList>
 #include <QJsonArray>
+#include <QMessageBox>
 #include "networkaccessmanager.h"
 #include "memorycookiejar.h"
 
@@ -34,25 +35,33 @@ protected:
     QImage renderImage();
     QString userAgentForUrl(const QUrl &url) const;
     virtual QWebPage* createWindow(WebWindowType type) Q_DECL_OVERRIDE;
+    void javaScriptAlert(QWebFrame* frame, const QString &msg);
 
 private:
     MemoryCookieJar* cookieJar;
     NetworkAccessManager* networkAccessManager;
     QString userAgent;
+    QMessageBox* alertBox;
     QMap<QString, FUN> commandMap;
 
 private:
+    // Window
     void getVersion(QJsonObject &in, QJsonObject &out);
-    void navigate(QJsonObject &in, QJsonObject &out);
     void setProxy(QJsonObject &in, QJsonObject &out);
-    void getUserAgent(QJsonObject &in, QJsonObject &out);
-    void setUserAgent(QJsonObject &in, QJsonObject &out);
     void setInterceptors(QJsonObject &in, QJsonObject &out);
     void getWindowBounds(QJsonObject &in, QJsonObject &out);
     void setWindowBounds(QJsonObject &in, QJsonObject &out);
     void getWindowState(QJsonObject &in, QJsonObject &out);
     void setWindowState(QJsonObject &in, QJsonObject &out);
     void close(QJsonObject &in, QJsonObject &out);
+    // Page
+    void navigate(QJsonObject &in, QJsonObject &out);
+    void currentUrl(QJsonObject &in, QJsonObject &out);
+    void getUserAgent(QJsonObject &in, QJsonObject &out);
+    void setUserAgent(QJsonObject &in, QJsonObject &out);
+    void hasAlert(QJsonObject &in, QJsonObject &out);
+    void alertText(QJsonObject &in, QJsonObject &out);
+    void closeAlert(QJsonObject &in, QJsonObject &out);
 
 signals:
     void commandProcessed(QByteArray &data);

@@ -44,9 +44,8 @@ super browser
 
 
 - [ ] Release
-  - [ ] Browser
+  - [ ] Window
     - [x] version
-    - [x] navigate
     - [x] getWindowBounds
     - [x] setWindowBounds
     - [x] getWindowState
@@ -71,13 +70,13 @@ super browser
     - [ ] setBlockedURLs
     - [x] setProxy
   - [ ] Page
-    - [ ] currentUrl
-    - [ ] progress
+    - [x] navigate
+    - [x] currentUrl
     - [x] getUserAgent
     - [x] setUserAgent
-    - [ ] hasAlert
-    - [ ] alertText
-    - [ ] acceptAlert
+    - [x] hasAlert
+    - [x] alertText
+    - [x] closeAlert
     - [ ] hasConfirm
     - [ ] confirmText
     - [ ] acceptConfirm(true/false)

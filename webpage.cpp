@@ -17,6 +17,7 @@ WebPage::WebPage(QObject* parent):
     userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36")
 {
     INSTANCE = this;
+    alertBox = new QMessageBox(MainWindow::instance()->getWebView());
     cookieJar = new MemoryCookieJar(this);
     connect(cookieJar, &MemoryCookieJar::cookieChanged, this, &WebPage::onCookieChanged);
     networkAccessManager = new NetworkAccessManager(cookieJar, this);
@@ -31,16 +32,20 @@ WebPage::WebPage(QObject* parent):
     settings->setOfflineStorageDefaultQuota(20*1024*1024);
     settings->setOfflineStoragePath(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
     commandMap.insert("getVersion", &WebPage::getVersion);
-    commandMap.insert("navigate", &WebPage::navigate);
     commandMap.insert("setProxy", &WebPage::setProxy);
-    commandMap.insert("getUserAgent", &WebPage::getUserAgent);
-    commandMap.insert("setUserAgent", &WebPage::setUserAgent);
     commandMap.insert("setInterceptors", &WebPage::setInterceptors);
     commandMap.insert("getWindowBounds", &WebPage::getWindowBounds);
     commandMap.insert("setWindowBounds", &WebPage::setWindowBounds);
     commandMap.insert("getWindowState", &WebPage::getWindowState);
     commandMap.insert("setWindowState", &WebPage::setWindowState);
     commandMap.insert("close", &WebPage::close);
+    commandMap.insert("navigate", &WebPage::navigate);
+    commandMap.insert("currentUrl", &WebPage::currentUrl);
+    commandMap.insert("getUserAgent", &WebPage::getUserAgent);
+    commandMap.insert("setUserAgent", &WebPage::setUserAgent);
+    commandMap.insert("hasAlert", &WebPage::hasAlert);
+    commandMap.insert("alertText", &WebPage::alertText);
+    commandMap.insert("closeAlert", &WebPage::closeAlert);
     QNetworkProxyFactory::setUseSystemConfiguration(true);
     connect(this, &WebPage::loadFinished, [](){
         QJsonObject data;
@@ -97,6 +102,14 @@ QWebPage* WebPage::createWindow(WebWindowType type) {
     return this;
 }
 
+void WebPage::javaScriptAlert(QWebFrame *frame, const QString &msg) {
+    alertBox->setTextFormat(Qt::PlainText);
+    alertBox->setWindowTitle(tr("Alert - %1").arg(this->currentFrame()->url().host()));
+    alertBox->setText(msg);
+    alertBox->setStandardButtons(QMessageBox::Ok);
+    alertBox->exec();
+}
+
 QList<QString> WebPage::getInterceptors() {
     return networkAccessManager->getInterceptors();
 }
@@ -113,10 +126,6 @@ void WebPage::getVersion(QJsonObject &in, QJsonObject &out) {
     out.insert("result", result);
 }
 
-void WebPage::navigate(QJsonObject &in, QJsonObject &out) {
-    QString url = in.value("params").toObject().value("url").toString("about:blank");
-    this->currentFrame()->setUrl(QUrl::fromUserInput(url));
-}
 
 void WebPage::setProxy(QJsonObject &in, QJsonObject &out) {
     QJsonObject proxyJson = in.value("params").toObject();
@@ -160,6 +169,24 @@ void WebPage::setUserAgent(QJsonObject &in, QJsonObject &out) {
     if(!ua.isEmpty()) {
         setUserAgent(ua);
     }
+}
+
+void WebPage::hasAlert(QJsonObject &in, QJsonObject &out) {
+    bool isHidden = alertBox->isHidden();
+    QJsonObject result;
+    result.insert("exist", !isHidden);
+    out.insert("result", result);
+}
+
+void WebPage::alertText(QJsonObject &in, QJsonObject &out) {
+    QString text = alertBox->text();
+    QJsonObject result;
+    result.insert("text", text);
+    out.insert("result", result);
+}
+
+void WebPage::closeAlert(QJsonObject &in, QJsonObject &out) {
+    alertBox->accept();
 }
 
 void WebPage::setInterceptors(QJsonObject &in, QJsonObject &out) {
@@ -252,6 +279,18 @@ void WebPage::setWindowState(QJsonObject &in, QJsonObject &out) {
 
 void WebPage::close(QJsonObject &in, QJsonObject &out) {
 
+}
+
+void WebPage::navigate(QJsonObject &in, QJsonObject &out) {
+    QString url = in.value("params").toObject().value("url").toString("about:blank");
+    this->currentFrame()->setUrl(QUrl::fromUserInput(url));
+}
+
+void WebPage::currentUrl(QJsonObject &in, QJsonObject &out) {
+    QString currentUrl = this->currentFrame()->url().toString();
+    QJsonObject result;
+    result.insert("currentUrl", currentUrl);
+    out.insert("result", result);
 }
 
 QImage WebPage::renderImage() {
