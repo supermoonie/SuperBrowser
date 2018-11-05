@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QStandardPaths>
 #include <QApplication>
+#include <QLabel>
 #include "websocketserver.h"
 #include "mainwindow.h"
 
@@ -21,6 +22,12 @@ WebPage::WebPage(QObject* parent):
     confirmBox = new QMessageBox(MainWindow::instance()->getWebView());
     confirmBox->addButton(tr("Cancel"), QMessageBox::RejectRole);
     confirmBox->addButton(tr("Ok"), QMessageBox::AcceptRole);
+    promptBox = new QInputDialog(MainWindow::instance()->getWebView());
+    QLabel* label = promptBox->findChild<QLabel*>();
+    if(label) {
+        label->setTextFormat(Qt::PlainText);
+    }
+    promptBox->setTextEchoMode(QLineEdit::Normal);
     cookieJar = new MemoryCookieJar(this);
     connect(cookieJar, &MemoryCookieJar::cookieChanged, this, &WebPage::onCookieChanged);
     networkAccessManager = new NetworkAccessManager(cookieJar, this);
@@ -127,6 +134,17 @@ bool WebPage::javaScriptConfirm(QWebFrame *originatingFrame, const QString &msg)
         qDebug() << "cancel";
         return false;
     }
+}
+
+bool WebPage::javaScriptPrompt(QWebFrame *originatingFrame, const QString &msg, const QString &defaultValue, QString *result) {
+    Q_UNUSED(originatingFrame);
+    promptBox->setLabelText(msg);
+    promptBox->setTextValue(defaultValue);
+    bool ok = !!promptBox->exec();
+    if(ok && result) {
+        *result = promptBox->textValue();
+    }
+    return ok;
 }
 
 QList<QString> WebPage::getInterceptors() {

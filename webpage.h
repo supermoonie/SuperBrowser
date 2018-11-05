@@ -9,6 +9,7 @@
 #include <QList>
 #include <QJsonArray>
 #include <QMessageBox>
+#include <QInputDialog>
 #include "networkaccessmanager.h"
 #include "memorycookiejar.h"
 
@@ -37,6 +38,7 @@ protected:
     virtual QWebPage* createWindow(WebWindowType type) Q_DECL_OVERRIDE;
     void javaScriptAlert(QWebFrame* frame, const QString &msg);
     bool javaScriptConfirm(QWebFrame *originatingFrame, const QString &msg);
+    bool javaScriptPrompt(QWebFrame *originatingFrame, const QString &msg, const QString &defaultValue, QString *result);
 
 private:
     MemoryCookieJar* cookieJar;
@@ -44,6 +46,7 @@ private:
     QString userAgent;
     QMessageBox* alertBox;
     QMessageBox* confirmBox;
+    QInputDialog* promptBox;
     QMap<QString, FUN> commandMap;
 
 private:
