@@ -65,6 +65,8 @@ private:
     void alertText(QJsonObject &in, QJsonObject &out);
     void closeAlert(QJsonObject &in, QJsonObject &out);
     void hasConfirm(QJsonObject &in, QJsonObject &out);
+    void confirmText(QJsonObject &in, QJsonObject &out);
+    void acceptConfirm(QJsonObject &in, QJsonObject &out);
 
 signals:
     void commandProcessed(QByteArray &data);

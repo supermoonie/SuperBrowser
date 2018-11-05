@@ -77,8 +77,8 @@ super browser
     - [x] hasAlert
     - [x] alertText
     - [x] closeAlert
-    - [ ] hasConfirm
-    - [ ] confirmText
+    - [x] hasConfirm
+    - [x] confirmText
     - [ ] acceptConfirm(true/false)
     - [ ] hasPrompt
     - [ ] setPromptInputValue

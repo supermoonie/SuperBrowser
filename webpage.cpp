@@ -19,6 +19,8 @@ WebPage::WebPage(QObject* parent):
     INSTANCE = this;
     alertBox = new QMessageBox(MainWindow::instance()->getWebView());
     confirmBox = new QMessageBox(MainWindow::instance()->getWebView());
+    confirmBox->addButton(tr("Cancel"), QMessageBox::RejectRole);
+    confirmBox->addButton(tr("Ok"), QMessageBox::AcceptRole);
     cookieJar = new MemoryCookieJar(this);
     connect(cookieJar, &MemoryCookieJar::cookieChanged, this, &WebPage::onCookieChanged);
     networkAccessManager = new NetworkAccessManager(cookieJar, this);
@@ -48,6 +50,8 @@ WebPage::WebPage(QObject* parent):
     commandMap.insert("alertText", &WebPage::alertText);
     commandMap.insert("closeAlert", &WebPage::closeAlert);
     commandMap.insert("hasConfirm", &WebPage::hasConfirm);
+    commandMap.insert("confirmText", &WebPage::confirmText);
+    commandMap.insert("acceptConfirm", &WebPage::acceptConfirm);
     QNetworkProxyFactory::setUseSystemConfiguration(true);
     connect(this, &WebPage::loadFinished, [](){
         QJsonObject data;
@@ -114,13 +118,13 @@ void WebPage::javaScriptAlert(QWebFrame *frame, const QString &msg) {
 
 bool WebPage::javaScriptConfirm(QWebFrame *originatingFrame, const QString &msg) {
     confirmBox->setTextFormat(Qt::PlainText);
-    confirmBox->setWindowTitle(tr("Alert - %1").arg(this->currentFrame()->url().host()));
+    confirmBox->setWindowTitle(tr("Confirm - %1").arg(this->currentFrame()->url().host()));
     confirmBox->setText(msg);
-    confirmBox->setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
     int code = confirmBox->exec();
-    if(code == QMessageBox::Ok) {
+    if(code == QMessageBox::Accepted) {
         return true;
     } else {
+        qDebug() << "cancel";
         return false;
     }
 }
@@ -194,10 +198,13 @@ void WebPage::hasAlert(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::alertText(QJsonObject &in, QJsonObject &out) {
-    QString text = alertBox->text();
-    QJsonObject result;
-    result.insert("text", text);
-    out.insert("result", result);
+    if(alertBox->isHidden()) {
+        out.insert("error", "No Alert!");
+    } else {
+        QJsonObject result;
+        result.insert("text", alertBox->text());
+        out.insert("result", result);
+    }
 }
 
 void WebPage::closeAlert(QJsonObject &in, QJsonObject &out) {
@@ -209,6 +216,30 @@ void WebPage::hasConfirm(QJsonObject &in, QJsonObject &out) {
     QJsonObject result;
     result.insert("exist", !isHidden);
     out.insert("result", result);
+}
+
+void WebPage::confirmText(QJsonObject &in, QJsonObject &out) {
+    if(confirmBox->isHidden()) {
+        out.insert("error", "No Confirm!");
+    } else {
+        QJsonObject result;
+        result.insert("text", confirmBox->text());
+        out.insert("result", result);
+    }
+}
+
+void WebPage::acceptConfirm(QJsonObject &in, QJsonObject &out) {
+    if(confirmBox->isHidden()) {
+        out.insert("error", "No Confirm!");
+    } else {
+        bool accept = in.value("params").toObject().value("accept").toBool(true);
+        qDebug() << accept;
+        if(accept) {
+            confirmBox->accept();
+        } else {
+            confirmBox->reject();
+        }
+    }
 }
 
 void WebPage::setInterceptors(QJsonObject &in, QJsonObject &out) {
