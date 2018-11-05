@@ -18,6 +18,7 @@ WebPage::WebPage(QObject* parent):
 {
     INSTANCE = this;
     alertBox = new QMessageBox(MainWindow::instance()->getWebView());
+    confirmBox = new QMessageBox(MainWindow::instance()->getWebView());
     cookieJar = new MemoryCookieJar(this);
     connect(cookieJar, &MemoryCookieJar::cookieChanged, this, &WebPage::onCookieChanged);
     networkAccessManager = new NetworkAccessManager(cookieJar, this);
@@ -46,6 +47,7 @@ WebPage::WebPage(QObject* parent):
     commandMap.insert("hasAlert", &WebPage::hasAlert);
     commandMap.insert("alertText", &WebPage::alertText);
     commandMap.insert("closeAlert", &WebPage::closeAlert);
+    commandMap.insert("hasConfirm", &WebPage::hasConfirm);
     QNetworkProxyFactory::setUseSystemConfiguration(true);
     connect(this, &WebPage::loadFinished, [](){
         QJsonObject data;
@@ -108,6 +110,19 @@ void WebPage::javaScriptAlert(QWebFrame *frame, const QString &msg) {
     alertBox->setText(msg);
     alertBox->setStandardButtons(QMessageBox::Ok);
     alertBox->exec();
+}
+
+bool WebPage::javaScriptConfirm(QWebFrame *originatingFrame, const QString &msg) {
+    confirmBox->setTextFormat(Qt::PlainText);
+    confirmBox->setWindowTitle(tr("Alert - %1").arg(this->currentFrame()->url().host()));
+    confirmBox->setText(msg);
+    confirmBox->setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+    int code = confirmBox->exec();
+    if(code == QMessageBox::Ok) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 QList<QString> WebPage::getInterceptors() {
@@ -187,6 +202,13 @@ void WebPage::alertText(QJsonObject &in, QJsonObject &out) {
 
 void WebPage::closeAlert(QJsonObject &in, QJsonObject &out) {
     alertBox->accept();
+}
+
+void WebPage::hasConfirm(QJsonObject &in, QJsonObject &out) {
+    bool isHidden = confirmBox->isHidden();
+    QJsonObject result;
+    result.insert("exist", !isHidden);
+    out.insert("result", result);
 }
 
 void WebPage::setInterceptors(QJsonObject &in, QJsonObject &out) {
@@ -282,6 +304,9 @@ void WebPage::close(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::navigate(QJsonObject &in, QJsonObject &out) {
+    if(!alertBox->isHidden()) {
+        return;
+    }
     QString url = in.value("params").toObject().value("url").toString("about:blank");
     this->currentFrame()->setUrl(QUrl::fromUserInput(url));
 }

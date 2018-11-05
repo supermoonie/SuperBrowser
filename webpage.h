@@ -36,12 +36,14 @@ protected:
     QString userAgentForUrl(const QUrl &url) const;
     virtual QWebPage* createWindow(WebWindowType type) Q_DECL_OVERRIDE;
     void javaScriptAlert(QWebFrame* frame, const QString &msg);
+    bool javaScriptConfirm(QWebFrame *originatingFrame, const QString &msg);
 
 private:
     MemoryCookieJar* cookieJar;
     NetworkAccessManager* networkAccessManager;
     QString userAgent;
     QMessageBox* alertBox;
+    QMessageBox* confirmBox;
     QMap<QString, FUN> commandMap;
 
 private:
@@ -62,6 +64,7 @@ private:
     void hasAlert(QJsonObject &in, QJsonObject &out);
     void alertText(QJsonObject &in, QJsonObject &out);
     void closeAlert(QJsonObject &in, QJsonObject &out);
+    void hasConfirm(QJsonObject &in, QJsonObject &out);
 
 signals:
     void commandProcessed(QByteArray &data);

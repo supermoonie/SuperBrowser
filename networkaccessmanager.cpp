@@ -32,7 +32,14 @@ QNetworkReply* NetworkAccessManager::createRequest(Operation op, const QNetworkR
         }
         url.append(QString(data));
     }
-    QNetworkReply * reply = QNetworkAccessManager::createRequest(op, request, outgoingData);
+    QNetworkReply * reply = NULL;
+    if(op == PostOperation && !request.header(QNetworkRequest::ContentTypeHeader).isValid()) {
+        QNetworkRequest req(request);
+        req.setHeader(QNetworkRequest::ContentTypeHeader, QVariant(tr("application/x-www-form-urlencoded")));
+        reply = QNetworkAccessManager::createRequest(op, req, outgoingData);
+    } else {
+        reply = QNetworkAccessManager::createRequest(op, request, outgoingData);
+    }
     QString extractor = matchWillBeExtract(QUrl(url));
     if(!extractor.isNull()) {
         if(reply->bytesAvailable() > 0) {
