@@ -34,11 +34,11 @@ public:
     QByteArray renderImage(const QString &format = "png", int quality = 20, const QRect &frameRect = QRect(0, 0, 0, 0));
 
 protected:
-    QString userAgentForUrl(const QUrl &url) const;
+    QString userAgentForUrl(const QUrl &url) const Q_DECL_OVERRIDE;
     virtual QWebPage* createWindow(WebWindowType type) Q_DECL_OVERRIDE;
-    void javaScriptAlert(QWebFrame* frame, const QString &msg);
-    bool javaScriptConfirm(QWebFrame *originatingFrame, const QString &msg);
-    bool javaScriptPrompt(QWebFrame *originatingFrame, const QString &msg, const QString &defaultValue, QString *result);
+    void javaScriptAlert(QWebFrame* frame, const QString &msg) Q_DECL_OVERRIDE;
+    bool javaScriptConfirm(QWebFrame *originatingFrame, const QString &msg) Q_DECL_OVERRIDE;
+    bool javaScriptPrompt(QWebFrame *originatingFrame, const QString &msg, const QString &defaultValue, QString *result) Q_DECL_OVERRIDE;
 
 private:
     MemoryCookieJar* cookieJar;
@@ -50,6 +50,7 @@ private:
     QMap<QString, FUN> commandMap;
 
 private:
+    void initCommandMap();
     // Window
     void getVersion(QJsonObject &in, QJsonObject &out);
     void setProxy(QJsonObject &in, QJsonObject &out);

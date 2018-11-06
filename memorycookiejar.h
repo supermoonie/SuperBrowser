@@ -21,7 +21,7 @@ public:
 
 public slots:
     void clearCookies();
-    bool deleteCookie(const QNetworkCookie &cookie);
+    bool deleteCookie(const QNetworkCookie &cookie) Q_DECL_OVERRIDE;
 
 };
 

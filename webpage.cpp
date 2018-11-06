@@ -42,8 +42,24 @@ WebPage::WebPage(QObject* parent):
     settings->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     settings->setOfflineStorageDefaultQuota(20*1024*1024);
     settings->setOfflineStoragePath(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
+    initCommandMap();
+    QNetworkProxyFactory::setUseSystemConfiguration(true);
+    connect(this, &WebPage::loadFinished, [](){
+        QJsonObject data;
+        data.insert("event", "loadFinished");
+        QJsonObject result;
+        data.insert("result", result);
+        WebSocketServer::instance()->sendTextMessageToAllClient(QString(QJsonDocument(data).toJson()));
+    });
+}
+
+WebPage::~WebPage()
+{
+
+}
+
+void WebPage::initCommandMap() {
     commandMap.insert("getVersion", &WebPage::getVersion);
-    commandMap.insert("setProxy", &WebPage::setProxy);
     commandMap.insert("setInterceptors", &WebPage::setInterceptors);
     commandMap.insert("getWindowBounds", &WebPage::getWindowBounds);
     commandMap.insert("setWindowBounds", &WebPage::setWindowBounds);
@@ -68,19 +84,7 @@ WebPage::WebPage(QObject* parent):
     commandMap.insert("toPlainText", &WebPage::toPlainText);
     commandMap.insert("setScrollBarPolicy", &WebPage::setScrollBarPolicy);
     commandMap.insert("captureScreenshot", &WebPage::captureScreenshot);
-    QNetworkProxyFactory::setUseSystemConfiguration(true);
-    connect(this, &WebPage::loadFinished, [](){
-        QJsonObject data;
-        data.insert("event", "loadFinished");
-        QJsonObject result;
-        data.insert("result", result);
-        WebSocketServer::instance()->sendTextMessageToAllClient(QString(QJsonDocument(data).toJson()));
-    });
-}
-
-WebPage::~WebPage()
-{
-
+    commandMap.insert("setProxy", &WebPage::setProxy);
 }
 
 WebPage* WebPage::instance() {
