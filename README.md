@@ -80,19 +80,18 @@ super browser
     - [x] hasConfirm
     - [x] confirmText
     - [x] acceptConfirm(true/false)
-    - [ ] hasPrompt
-    - [ ] setPromptInputValue
-    - [ ] acceptPrompt(true/false)
-    - [ ] setHtml
-    - [ ] toHtml
-    - [ ] toPlainText
+    - [x] hasPrompt
+    - [x] setPromptValue
+    - [x] acceptPrompt(true/false)
+    - [x] setHtml
+    - [x] toHtml
+    - [x] toPlainText
     - [ ] CaptureScreenshot
     - [ ] PrintToPDF
     - [ ] Reload
-    - [ ] SetDocumentContent
     - [ ] StopLoading
   - [ ] Runtime
-    - [ ] Evaluate
+    - [ ] runJavaScript
 
 ```json
 {

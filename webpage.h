@@ -70,6 +70,12 @@ private:
     void hasConfirm(QJsonObject &in, QJsonObject &out);
     void confirmText(QJsonObject &in, QJsonObject &out);
     void acceptConfirm(QJsonObject &in, QJsonObject &out);
+    void hasPrompt(QJsonObject &in, QJsonObject &out);
+    void setPromptValue(QJsonObject &in, QJsonObject &out);
+    void acceptPrompt(QJsonObject &in, QJsonObject &out);
+    void setHtml(QJsonObject &in, QJsonObject &out);
+    void toHtml(QJsonObject &in, QJsonObject &out);
+    void toPlainText(QJsonObject &in, QJsonObject &out);
 
 signals:
     void commandProcessed(QByteArray &data);

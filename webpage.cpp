@@ -59,6 +59,12 @@ WebPage::WebPage(QObject* parent):
     commandMap.insert("hasConfirm", &WebPage::hasConfirm);
     commandMap.insert("confirmText", &WebPage::confirmText);
     commandMap.insert("acceptConfirm", &WebPage::acceptConfirm);
+    commandMap.insert("hasPrompt", &WebPage::hasPrompt);
+    commandMap.insert("setPromptValue", &WebPage::setPromptValue);
+    commandMap.insert("acceptPrompt", &WebPage::acceptPrompt);
+    commandMap.insert("setHtml", &WebPage::setHtml);
+    commandMap.insert("toHtml", &WebPage::toHtml);
+    commandMap.insert("toPlainText", &WebPage::toPlainText);
     QNetworkProxyFactory::setUseSystemConfiguration(true);
     connect(this, &WebPage::loadFinished, [](){
         QJsonObject data;
@@ -163,7 +169,6 @@ void WebPage::getVersion(QJsonObject &in, QJsonObject &out) {
     out.insert("result", result);
 }
 
-
 void WebPage::setProxy(QJsonObject &in, QJsonObject &out) {
     QJsonObject proxyJson = in.value("params").toObject();
     QJsonDocument document(proxyJson);
@@ -251,7 +256,6 @@ void WebPage::acceptConfirm(QJsonObject &in, QJsonObject &out) {
         out.insert("error", "No Confirm!");
     } else {
         bool accept = in.value("params").toObject().value("accept").toBool(true);
-        qDebug() << accept;
         if(accept) {
             confirmBox->accept();
         } else {
@@ -260,7 +264,65 @@ void WebPage::acceptConfirm(QJsonObject &in, QJsonObject &out) {
     }
 }
 
+void WebPage::hasPrompt(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(in);
+    bool isHidden = promptBox->isHidden();
+    QJsonObject result;
+    result.insert("exist", !isHidden);
+    out.insert("result", result);
+}
+
+void WebPage::setPromptValue(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(out);
+    if(promptBox->isHidden()) {
+        out.insert("error", "No Prompt!");
+    } else {
+        QString text = in.value("params").toObject().value("text").toString("");
+        promptBox->setTextValue(text);
+    }
+}
+
+void WebPage::acceptPrompt(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(out);
+    if(promptBox->isHidden()) {
+        out.insert("error", "No Prompt!");
+    } else {
+        bool accept = in.value("params").toObject().value("accept").toBool(false);
+        if(accept) {
+            promptBox->accept();
+        } else {
+            promptBox->reject();
+        }
+    }
+}
+
+void WebPage::setHtml(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(out);
+    QJsonObject htmlJson = in.value("params").toObject();
+    QString html = htmlJson.value("html").toString("");
+    QUrl url = QUrl::fromUserInput(htmlJson.value("baseUrl").toString(""));
+    QWebView* webView = MainWindow::instance()->getWebView();
+    webView->setHtml(html, url);
+}
+
+void WebPage::toHtml(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(in);
+    QString html = this->mainFrame()->toHtml();
+    QJsonObject result;
+    result.insert("html", html);
+    out.insert("result", result);
+}
+
+void WebPage::toPlainText(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(in);
+    QString text = this->mainFrame()->toPlainText();
+    QJsonObject result;
+    result.insert("text", text);
+    out.insert("result", result);
+}
+
 void WebPage::setInterceptors(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(out);
     QJsonArray interceptorsArr = in.value("params").toArray();
     QList<QString> interceptors;
     for(int i = 0; i < interceptorsArr.size(); i ++) {
@@ -276,6 +338,7 @@ void WebPage::setInterceptors(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::getWindowBounds(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(in);
     QRect rect = MainWindow::instance()->frameGeometry();
     QJsonObject result;
     result.insert("x", rect.x());
@@ -286,6 +349,7 @@ void WebPage::getWindowBounds(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::setWindowBounds(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(out);
     QJsonObject boundsJson = in.value("params").toObject();
     if(boundsJson.contains("bounds")) {
         boundsJson = boundsJson.value("bounds").toObject();
@@ -357,11 +421,12 @@ void WebPage::navigate(QJsonObject &in, QJsonObject &out) {
         return;
     }
     QString url = in.value("params").toObject().value("url").toString("about:blank");
-    this->currentFrame()->setUrl(QUrl::fromUserInput(url));
+    this->mainFrame()->setUrl(QUrl::fromUserInput(url));
 }
 
 void WebPage::currentUrl(QJsonObject &in, QJsonObject &out) {
-    QString currentUrl = this->currentFrame()->url().toString();
+    Q_UNUSED(in);
+    QString currentUrl = this->mainFrame()->url().toString();
     QJsonObject result;
     result.insert("currentUrl", currentUrl);
     out.insert("result", result);
