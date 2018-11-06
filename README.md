@@ -1,6 +1,7 @@
 # SuperBrowser
-super browser
 
+
+- [ ] SuperBrowser 更名为 AutoBrowser
 - [ ] Debug
   - [ ] File
     - [ ] Open
@@ -38,7 +39,6 @@ super browser
   - [ ] Mail
     - [ ] login
     - [ ] receive
-
 - [ ] 将 Interceptor 移入 Network 中
 
 
@@ -86,7 +86,8 @@ super browser
     - [x] setHtml
     - [x] toHtml
     - [x] toPlainText
-    - [ ] CaptureScreenshot
+    - [x] setScrollBarPolicy
+    - [x] captureScreenshot
     - [ ] PrintToPDF
     - [ ] Reload
     - [ ] StopLoading

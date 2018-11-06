@@ -8,6 +8,7 @@
 #include <QStandardPaths>
 #include <QApplication>
 #include <QLabel>
+#include <QWebElement>
 #include "websocketserver.h"
 #include "mainwindow.h"
 
@@ -65,6 +66,8 @@ WebPage::WebPage(QObject* parent):
     commandMap.insert("setHtml", &WebPage::setHtml);
     commandMap.insert("toHtml", &WebPage::toHtml);
     commandMap.insert("toPlainText", &WebPage::toPlainText);
+    commandMap.insert("setScrollBarPolicy", &WebPage::setScrollBarPolicy);
+    commandMap.insert("captureScreenshot", &WebPage::captureScreenshot);
     QNetworkProxyFactory::setUseSystemConfiguration(true);
     connect(this, &WebPage::loadFinished, [](){
         QJsonObject data;
@@ -114,14 +117,17 @@ QString WebPage::getUserAgent() {
 }
 
 QString WebPage::userAgentForUrl(const QUrl &url) const {
+    Q_UNUSED(url);
     return userAgent;
 }
 
 QWebPage* WebPage::createWindow(WebWindowType type) {
+    Q_UNUSED(type);
     return this;
 }
 
 void WebPage::javaScriptAlert(QWebFrame *frame, const QString &msg) {
+    Q_UNUSED(frame);
     alertBox->setTextFormat(Qt::PlainText);
     alertBox->setWindowTitle(tr("Alert - %1").arg(this->currentFrame()->url().host()));
     alertBox->setText(msg);
@@ -130,6 +136,7 @@ void WebPage::javaScriptAlert(QWebFrame *frame, const QString &msg) {
 }
 
 bool WebPage::javaScriptConfirm(QWebFrame *originatingFrame, const QString &msg) {
+    Q_UNUSED(originatingFrame);
     confirmBox->setTextFormat(Qt::PlainText);
     confirmBox->setWindowTitle(tr("Confirm - %1").arg(this->currentFrame()->url().host()));
     confirmBox->setText(msg);
@@ -163,6 +170,7 @@ void WebPage::setInterceptors(const QList<QString> &interceptors) {
 
 // Command
 void WebPage::getVersion(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(in);
     QJsonObject result;
     result.insert("major", 1);
     result.insert("minor", 0);
@@ -170,6 +178,7 @@ void WebPage::getVersion(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::setProxy(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(out);
     QJsonObject proxyJson = in.value("params").toObject();
     QJsonDocument document(proxyJson);
     qDebug() << QString(document.toJson());
@@ -200,12 +209,14 @@ void WebPage::setProxy(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::getUserAgent(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(in);
     QJsonObject userAgentJson;
     userAgentJson.insert("userAgent", this->userAgent);
     out.insert("result", userAgentJson);
 }
 
 void WebPage::setUserAgent(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(out);
     QJsonObject userAgentJson = in.value("params").toObject();
     QString ua = userAgentJson.value("userAgent").toString();
     if(!ua.isEmpty()) {
@@ -214,6 +225,7 @@ void WebPage::setUserAgent(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::hasAlert(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(in);
     bool isHidden = alertBox->isHidden();
     QJsonObject result;
     result.insert("exist", !isHidden);
@@ -221,6 +233,7 @@ void WebPage::hasAlert(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::alertText(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(in);
     if(alertBox->isHidden()) {
         out.insert("error", "No Alert!");
     } else {
@@ -231,10 +244,13 @@ void WebPage::alertText(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::closeAlert(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(in);
+    Q_UNUSED(out);
     alertBox->accept();
 }
 
 void WebPage::hasConfirm(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(in);
     bool isHidden = confirmBox->isHidden();
     QJsonObject result;
     result.insert("exist", !isHidden);
@@ -242,6 +258,7 @@ void WebPage::hasConfirm(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::confirmText(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(in);
     if(confirmBox->isHidden()) {
         out.insert("error", "No Confirm!");
     } else {
@@ -321,6 +338,76 @@ void WebPage::toPlainText(QJsonObject &in, QJsonObject &out) {
     out.insert("result", result);
 }
 
+void WebPage::setScrollBarPolicy(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(out);
+    QJsonObject paramJson = in.value("params").toObject();
+    QString horizontalPolicy = paramJson.value("horizontalPolicy").toString("ScrollBarAsNeeded");
+    QString verticalPolicy = paramJson.value("verticalPolicy").toString("ScrollBarAsNeeded");
+    if(horizontalPolicy == "ScrollBarAlwaysOff") {
+        this->mainFrame()->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
+        QSize originSize = MainWindow::instance()->size();
+        QSize size(originSize.width() + 100, originSize.height() + 100);
+        MainWindow::instance()->resize(size);
+        MainWindow::instance()->resize(originSize);
+    } else if(horizontalPolicy == "ScrollBarAlwaysOn") {
+        this->mainFrame()->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOn);
+    } else {
+        this->mainFrame()->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAsNeeded);
+    }
+    if(verticalPolicy == "ScrollBarAlwaysOff") {
+        this->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
+        QSize originSize = MainWindow::instance()->size();
+        QSize size(originSize.width() + 100, originSize.height() + 100);
+        MainWindow::instance()->resize(size);
+        MainWindow::instance()->resize(originSize);
+    } else if(verticalPolicy == "ScrollBarAlwaysOn") {
+        this->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOn);
+    } else {
+        this->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAsNeeded);
+    }
+
+}
+
+void WebPage::captureScreenshot(QJsonObject &in, QJsonObject &out) {
+    QJsonObject paramJson = in.value("params").toObject();
+    QString format = "png";
+    int quality = 20;
+    QSize contentsSize = this->mainFrame()->contentsSize();
+    QSize viewportSize = this->viewportSize();
+    QRect frameRect(QPoint(0, 0), viewportSize);
+    if(paramJson.contains("format") && paramJson.contains("quality") && paramJson.contains("clip")) {
+        QString imageFormat = paramJson.value("format").toString();
+        if(!imageFormat.isEmpty() && imageFormat == "jpeg") {
+            format = "jpeg";
+        }
+        int imageQuality = paramJson.value("quality").toInt();
+        if(imageQuality >= 0 && imageQuality <= 100) {
+            quality = imageQuality;
+        }
+        QJsonObject clipJson = paramJson.value("clip").toObject();
+        int x = clipJson.value("x").toInt();
+        int y = clipJson.value("y'").toInt();
+        int width = clipJson.value("width").toInt();
+        int height = clipJson.value("height").toInt();
+        if(x >= 0 && width > 0 && (x + width) <= contentsSize.width() &&
+                y >= 0 && height > 0 &&(y + height) <= contentsSize.height()) {
+            frameRect.setX(x);
+            frameRect.setY(y);
+            frameRect.setWidth(width);
+            frameRect.setHeight(height);
+        }
+    } else if(paramJson.contains("fullScreen")) {
+        bool fullScreen = in.value("params").toObject().value("fullScreen").toBool(false);
+        if(fullScreen) {
+            frameRect.setSize(contentsSize);
+        }
+    }
+    QByteArray base64Image = this->renderImage(format, quality, frameRect);
+    QJsonObject result;
+    result.insert("data", tr(base64Image));
+    out.insert("result", result);
+}
+
 void WebPage::setInterceptors(QJsonObject &in, QJsonObject &out) {
     Q_UNUSED(out);
     QJsonArray interceptorsArr = in.value("params").toArray();
@@ -369,6 +456,7 @@ void WebPage::setWindowBounds(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::getWindowState(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(in);
     QJsonObject result;
     Qt::WindowStates windowState = MainWindow::instance()->windowState();
     QString state;
@@ -397,6 +485,7 @@ void WebPage::getWindowState(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::setWindowState(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(out);
     QString state = in.value("params").toObject().value("state").toString("normal");
     MainWindow* window = MainWindow::instance();
     if(state == "normal" && Qt::WindowNoState != window->windowState()) {
@@ -413,10 +502,12 @@ void WebPage::setWindowState(QJsonObject &in, QJsonObject &out) {
 }
 
 void WebPage::close(QJsonObject &in, QJsonObject &out) {
-
+    Q_UNUSED(in);
+    Q_UNUSED(out);
 }
 
 void WebPage::navigate(QJsonObject &in, QJsonObject &out) {
+    Q_UNUSED(out);
     if(!alertBox->isHidden()) {
         return;
     }
@@ -432,27 +523,20 @@ void WebPage::currentUrl(QJsonObject &in, QJsonObject &out) {
     out.insert("result", result);
 }
 
-QImage WebPage::renderImage() {
-    QRect frameRect;
-    QSize viewportSize = this->viewportSize();
-    QSize contentsSize = this->mainFrame()->contentsSize();
-    frameRect = QRect(QPoint(0, 0), contentsSize);
-    this->setViewportSize(contentsSize);
-    QImage::Format format = QImage::Format_ARGB32_Premultiplied;
-    QImage buffer(frameRect.size(), format);
-    buffer.fill(Qt::transparent);
+QByteArray WebPage::renderImage(const QString &format, int quality, const QRect &frameRect) {
+    this->setViewportSize(frameRect.size());
+    QImage img(frameRect.size(), QImage::Format_ARGB32_Premultiplied);
+    img.fill(Qt::transparent);
     QPainter painter;
     const int tileSize = 4096;
-    int htiles = (buffer.width() + tileSize - 1) / tileSize;
-    int vtiles = (buffer.height() + tileSize - 1) / tileSize;
+    int htiles = (img.width() + tileSize - 1) / tileSize;
+    int vtiles = (img.height() + tileSize - 1) / tileSize;
     for (int x = 0; x < htiles; ++x) {
         for (int y = 0; y < vtiles; ++y) {
-
-            QImage tileBuffer(tileSize, tileSize, format);
-            tileBuffer.fill(Qt::transparent);
-
+            QImage tileImg(tileSize, tileSize, QImage::Format_ARGB32_Premultiplied);
+            tileImg.fill(Qt::transparent);
             // Render the web page onto the small tile first
-            painter.begin(&tileBuffer);
+            painter.begin(&tileImg);
             painter.setRenderHint(QPainter::Antialiasing, true);
             painter.setRenderHint(QPainter::TextAntialiasing, true);
             painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
@@ -460,15 +544,19 @@ QImage WebPage::renderImage() {
             painter.translate(-x * tileSize, -y * tileSize);
             this->mainFrame()->render(&painter, QRegion(frameRect));
             painter.end();
-
             // Copy the tile to the main buffer
-            painter.begin(&buffer);
+            painter.begin(&img);
             painter.setCompositionMode(QPainter::CompositionMode_Source);
-            painter.drawImage(x * tileSize, y * tileSize, tileBuffer);
+            painter.drawImage(x * tileSize, y * tileSize, tileImg);
             painter.end();
         }
     }
-    return buffer;
+    QByteArray imgByteArray;
+    QBuffer buf(&imgByteArray);
+    img.save(&buf, format.toUtf8().data(), quality);
+    QByteArray hexed = imgByteArray.toBase64();
+    buf.close();
+    return hexed;
 }
 
 void WebPage::onCommandReceived(QWebSocket* client, const QString &command) {

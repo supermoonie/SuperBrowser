@@ -31,9 +31,9 @@ public:
     QString getUserAgent();
     void setInterceptors(const QList<QString> &interceptors);
     QList<QString> getInterceptors();
+    QByteArray renderImage(const QString &format = "png", int quality = 20, const QRect &frameRect = QRect(0, 0, 0, 0));
 
 protected:
-    QImage renderImage();
     QString userAgentForUrl(const QUrl &url) const;
     virtual QWebPage* createWindow(WebWindowType type) Q_DECL_OVERRIDE;
     void javaScriptAlert(QWebFrame* frame, const QString &msg);
@@ -76,6 +76,8 @@ private:
     void setHtml(QJsonObject &in, QJsonObject &out);
     void toHtml(QJsonObject &in, QJsonObject &out);
     void toPlainText(QJsonObject &in, QJsonObject &out);
+    void setScrollBarPolicy(QJsonObject &in, QJsonObject &out);
+    void captureScreenshot(QJsonObject &in, QJsonObject &out);
 
 signals:
     void commandProcessed(QByteArray &data);
